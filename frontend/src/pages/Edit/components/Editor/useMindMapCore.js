@@ -19,8 +19,8 @@ export default function useMindMapCore(
   useLeftKeySelectionRightKeyDrag,
   extraTextOnExport,
 ) {
-  /** @type {import('simple-mind-map').default | null} */
-  let mindMap = null
+  /** @type {ShallowRef<import('simple-mind-map').default | null>} */
+  const mindMap = shallowRef(null)
   const router = useRouter()
   const t = useTranslation()
   const mindMapData = ref(null)
@@ -214,7 +214,7 @@ export default function useMindMapCore(
       'node_mousedown',
     ]
     events.forEach((event) => {
-      mindMap.on(event, (...args) => emitter.emit(event, ...args))
+      mindMap.value.on(event, (...args) => emitter.emit(event, ...args))
     })
   }
 
@@ -222,19 +222,19 @@ export default function useMindMapCore(
    * 添加快捷键
    */
   const addShortcuts = (manualSave) => {
-    mindMap.keyCommand.addShortcut('Control+s', manualSave)
+    mindMap.value.keyCommand.addShortcut('Control+s', manualSave)
   }
 
   /**
    * 处理特殊情况
    */
   const handleSpecialCases = () => {
-    if (window.takeOverApp) emitter.emit('app_inited', mindMap)
+    if (window.takeOverApp) emitter.emit('app_inited', mindMap.value)
     if (hasFileURL()) emitter.emit('handle_file_url')
 
     // 提供获取最新数据的方法
     window.getCurrentData = () => {
-      const fullData = mindMap.getData(true)
+      const fullData = mindMap.value.getData(true)
       return { ...fullData }
     }
   }
@@ -243,12 +243,12 @@ export default function useMindMapCore(
    * 初始化协同测试功能
    */
   const initCooperateTest = () => {
-    if (mindMap.cooperate && router.currentRoute.value.query.userName) {
-      mindMap.cooperate.setProvider(null, {
+    if (mindMap.value.cooperate && router.currentRoute.value.query.userName) {
+      mindMap.value.cooperate.setProvider(null, {
         roomName: 'demo-room',
         signalingList: ['ws://localhost:4444'],
       })
-      mindMap.cooperate.setUserInfo({
+      mindMap.value.cooperate.setUserInfo({
         id: Math.random(),
         name: router.currentRoute.value.query.userName,
         color: ['#409EFF', '#67C23A', '#E6A23C', '#F56C6C', '#909399'][
@@ -280,7 +280,7 @@ export default function useMindMapCore(
     config.viewData = initialData.view
 
     // 创建mindMap实例
-    mindMap = new MindMap(config)
+    mindMap.value = new MindMap(config)
 
     // 初始化插件
     initPlugins(mindMap)
@@ -305,7 +305,7 @@ export default function useMindMapCore(
    * 清理资源
    */
   const cleanup = () => {
-    if (mindMap) mindMap.destroy()
+    if (mindMap.value) mindMap.value.destroy()
     clearTimeout(storeConfigTimer.value)
   }
 

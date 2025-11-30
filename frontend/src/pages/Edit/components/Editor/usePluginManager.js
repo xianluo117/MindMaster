@@ -93,42 +93,42 @@ class PluginManager {
 
   /**
    * 设置mindMap实例
-   * @param {import('simple-mind-map').default} mindMap - simple-mind-map 实例
+   * @param {ShallowRef<import('simple-mind-map').default>} mindMap - simple-mind-map 实例
    */
   setMindMapInstance(mindMap) {
-    this.mindMapInstance = mindMap
+    this.mindMapInstance = mindMap.value
   }
 
   /**
    * 添加富文本插件
    */
   addRichTextPlugin() {
-    if (!this.mindMapInstance) return
-    this.mindMapInstance.addPlugin(RichText)
+    if (!mindMap.value) return
+    mindMap.value.addPlugin(RichText)
   }
 
   /**
    * 移除富文本插件
    */
   removeRichTextPlugin() {
-    if (!this.mindMapInstance) return
-    this.mindMapInstance.removePlugin('RichText')
+    if (!mindMap.value) return
+    mindMap.value.removePlugin('RichText')
   }
 
   /**
    * 添加滚动条插件
    */
   addScrollbarPlugin() {
-    if (!this.mindMapInstance) return
-    this.mindMapInstance.addPlugin(ScrollbarPlugin)
+    if (!mindMap.value) return
+    mindMap.value.addPlugin(ScrollbarPlugin)
   }
 
   /**
    * 移除滚动条插件
    */
   removeScrollbarPlugin() {
-    if (!this.mindMapInstance) return
-    this.mindMapInstance.removePlugin(ScrollbarPlugin)
+    if (!mindMap.value) return
+    mindMap.value.removePlugin(ScrollbarPlugin)
   }
 
   /**

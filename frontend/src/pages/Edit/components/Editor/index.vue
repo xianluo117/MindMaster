@@ -56,10 +56,10 @@ import emitter from '@/utils/eventBus.js'
 import { showLoading } from '@/utils/loading'
 import MindMap from 'simple-mind-map'
 import appStore from '@/stores'
-import usePluginManager from './hooks/usePluginManager.js'
-import useMindMapCore from './hooks/useMindMapCore.js'
-import useMindMapActions from './hooks/useMindMapActions.js'
-import useDragAndDrop from './hooks/useDragAndDrop.js'
+import usePluginManager from './usePluginManager.js'
+import useMindMapCore from './useMindMapCore.js'
+import useMindMapActions from './useMindMapActions.js'
+import useDragAndDrop from './useDragAndDrop.js'
 import Count from '@/pages/Edit/components/Count/index.vue'
 import NavigatorToolbar from '@/pages/Edit/components/NavigatorToolbar/index.vue'
 
@@ -135,8 +135,8 @@ const {
 onMounted(async () => {
   showLoading()
   getMindMapData()
-  const pluginManager = getPluginManager()
-  pluginManager.setMindMapInstance(mindMap)
+  // const pluginManager = getPluginManager()
+  // pluginManager.setMindMapInstance(mindMap)
   initMindMap(mindMapRef, manualSave)
 
   // 监听事件
