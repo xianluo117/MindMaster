@@ -4,6 +4,7 @@
       :is="icon"
       :size="size"
       :stroke-width="strokeWidth"
+      :stroke-color="strokeColor"
       @click="() => handleClick(name)"
     />
   </t-tooltip>
@@ -29,6 +30,10 @@ defineProps({
   strokeWidth: {
     type: Number,
     default: 1.5,
+  },
+  strokeColor: {
+    type: String,
+    default: 'currentColor',
   },
   // 添加一个标识符属性，用于标识按钮类型
   name: {

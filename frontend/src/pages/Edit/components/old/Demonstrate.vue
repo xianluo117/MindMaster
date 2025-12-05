@@ -1,11 +1,6 @@
 <template>
   <div class="demonstrateContainer" :class="{ isDark: isDark }">
-    <el-tooltip
-      class="item"
-      effect="dark"
-      :content="$t('demonstrate.demonstrate')"
-      placement="top"
-    >
+    <el-tooltip class="item" effect="dark" :content="$t('demonstrate.demonstrate')" placement="top">
       <div class="btn iconfont iconyanshibofang" @click="enterDemoMode"></div>
     </el-tooltip>
     <div
@@ -31,20 +26,11 @@
         <span class="icon el-icon-back"></span>
       </div>
       <div class="step">{{ curStepIndex + 1 }} / {{ totalStep }}</div>
-      <div
-        class="jump"
-        @click="next"
-        :class="{ disabled: curStepIndex >= totalStep - 1 }"
-      >
+      <div class="jump" @click="next" :class="{ disabled: curStepIndex >= totalStep - 1 }">
         <span class="icon el-icon-right"></span>
       </div>
       <div class="input">
-        <input
-          type="text"
-          v-model="inputStep"
-          @keyup.enter.stop="onEnter"
-          @keydown.stop
-        />
+        <input type="text" v-model="inputStep" @keyup.enter.stop="onEnter" @keydown.stop />
       </div>
     </div>
   </div>
@@ -54,18 +40,18 @@
 export default {
   props: {
     mindMap: {
-      type: Object
+      type: Object,
     },
     isDark: {
-      type: Boolean
-    }
+      type: Boolean,
+    },
   },
   data() {
     return {
       isEnterDemonstrate: false,
       curStepIndex: 0,
       totalStep: 0,
-      inputStep: ''
+      inputStep: '',
     }
   },
   created() {
@@ -94,6 +80,7 @@ export default {
     },
 
     onJump(index, total) {
+      console.log('onJump', index, total)
       this.curStepIndex = index
       this.totalStep = total
     },
@@ -113,8 +100,8 @@ export default {
       } else if (num >= 1 && num <= this.totalStep) {
         this.mindMap.demonstrate.jump(num - 1)
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

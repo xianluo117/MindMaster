@@ -5,6 +5,7 @@ import { useLocalStorage } from '@vueuse/core'
 // import { useAppStore } from '@/stores'
 
 const MINDMASTER_DATA = 'MINDMASTER_DATA'
+const MINDMASTER_CONFIG = 'MINDMASTER_CONFIG'
 // const MINDMASTER_LANG = 'MINDMASTER_LANG'
 const MINDMASTER_LOCAL_CONFIG = 'MINDMASTER_LOCAL_CONFIG'
 
@@ -12,7 +13,7 @@ const MINDMASTER_LOCAL_CONFIG = 'MINDMASTER_LOCAL_CONFIG'
 const dataStorage = useLocalStorage(MINDMASTER_DATA, null)
 // const langStorage = useLocalStorage(MINDMASTER_LANG, 'zh')
 const localConfigStorage = useLocalStorage(MINDMASTER_LOCAL_CONFIG, null)
-const configStorage = useLocalStorage('MINDMASTER_CONFIG', null)
+const configStorage = useLocalStorage(MINDMASTER_CONFIG, null)
 
 /**
  * @description: 获取缓存的思维导图数据
@@ -39,6 +40,9 @@ export const getData = () => {
 export const storeData = (data) => {
   try {
     let originData = getData()
+    if (!originData) {
+      originData = {}
+    }
     originData = {
       ...originData,
       ...data,
@@ -47,6 +51,9 @@ export const storeData = (data) => {
     dataStorage.value = JSON.stringify(originData)
   } catch (error) {
     console.error(error)
+    if ('exceeded') {
+      emitter.emit('localStorageExceeded')
+    }
   }
 }
 
@@ -59,7 +66,7 @@ export const getConfig = () => {
   if (config) {
     return JSON.parse(config)
   }
-  return {}
+  return null
 }
 
 /**

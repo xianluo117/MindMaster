@@ -1,31 +1,15 @@
 <template>
-  <div
-    v-if="showMiniMap"
-    class="navigatorBox"
-    :class="{ isDark: isDark }"
-    ref="navigatorBox"
-    :style="{ width: width + 'px' }"
-    @mousedown="onMousedown"
-    @mousemove="onMousemove"
-  >
-    <div
-      class="svgBox"
-      ref="svgBox"
-      :style="{
-        transform: `scale(${svgBoxScale})`,
-        left: svgBoxLeft + 'px',
-        top: svgBoxTop + 'px'
-      }"
-    >
+  <div v-if="showMiniMap" class="navigatorBox" :class="{ isDark: isDark }" ref="navigatorBox"
+    :style="{ width: width + 'px' }" @mousedown="onMousedown" @mousemove="onMousemove">
+    <div class="svgBox" ref="svgBox" :style="{
+      transform: `scale(${svgBoxScale})`,
+      left: svgBoxLeft + 'px',
+      top: svgBoxTop + 'px'
+    }">
       <img :src="mindMapImg" @mousedown.prevent />
     </div>
-    <div
-      class="windowBox"
-      :style="viewBoxStyle"
-      :class="{ withTransition: withTransition }"
-      @mousedown.stop="onViewBoxMousedown"
-      @mousemove="onViewBoxMousemove"
-    ></div>
+    <div class="windowBox" :style="viewBoxStyle" :class="{ withTransition: withTransition }"
+      @mousedown.stop="onViewBoxMousedown" @mousemove="onViewBoxMousemove"></div>
   </div>
 </template>
 

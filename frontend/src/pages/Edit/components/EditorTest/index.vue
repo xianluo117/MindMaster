@@ -7,10 +7,10 @@
     @dragover.stop.prevent
     @drop.stop.prevent
   >
-    <div class="mindMapContainer" id="mindMapRef" ref="mindMapRef"></div>
+    <div class="mindMapContainer" id="mindMapContainer" ref="mindMapRef"></div>
 
     <Count v-if="!appStore.localConfig.isZenMode" :mindMap="mindMap" />
-    <!-- <Navigator v-if="mindMap" :mindMap="mindMap" /> -->
+    <Navigator v-if="mindMap" :mindMap="mindMap" />
     <NavigatorToolbar v-if="!appStore.localConfig.isZenMode" :mindMap="mindMap" />
 
     <!-- 拖拽遮罩 -->
@@ -27,7 +27,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import appStore from '@/stores'
 import emitter from '@/utils/eventBus'
@@ -36,7 +36,7 @@ import { showLoading, hideLoading } from '@/utils/loading'
 
 // 导入所有UI组件
 import Count from '../Count/index.vue'
-// import Navigator from './components/Navigator.vue'
+import Navigator from '../Navigator/index.vue'
 import NavigatorToolbar from '../NavigatorToolbar/index.vue'
 // import OutlineSidebar from './components/OutlineSidebar.vue'
 // import Style from './components/Style.vue'
@@ -73,7 +73,6 @@ const t = useTranslation()
 const route = useRoute()
 const mindMapRef = ref(null)
 
-// 使用composables
 const {
   mindMap,
   mindMapData,
@@ -88,11 +87,10 @@ const {
   reRender,
 } = useMindMap(mindMapRef)
 
-const { addRichTextPlugin, removeRichTextPlugin, addScrollbarPlugin, removeScrollbarPlugin } =
-  usePlugins(mindMap)
-
 const { showDragMask, onDragEnter, onDragLeave, onDrop } = useDragImport()
 
+const { addRichTextPlugin, removeRichTextPlugin, addScrollbarPlugin, removeScrollbarPlugin } =
+  usePlugins(mindMap)
 const {
   // handleStartTextEdit,
   // handleEndTextEdit,
@@ -103,24 +101,14 @@ const {
   unbindEvents,
 } = useEventHandlers(mindMap)
 
-/** url中是否存在要打开的文件 */
-const hasFileURL = () => {
-  const fileURL = route.query.fileURL
-  if (!fileURL) return false
-  return /\.(smm|json|xmind|md|xlsx)$/.test(fileURL)
-}
-
 const init = () => {
-  const fileURLExists = hasFileURL()
-  initMindMap(fileURLExists)
-
-  // 加载插件
-  if (appStore.localConfig.openNodeRichText) addRichTextPlugin()
-  if (appStore.localConfig.isShowScrollbar) addScrollbarPlugin()
-
-  // 解析url中的文件
-  if (fileURLExists) {
-    emitter.emit('handle_file_url')
+  try {
+    initMindMap()
+    // 加载插件
+    if (appStore.localConfig.openNodeRichText) addRichTextPlugin()
+    if (appStore.localConfig.isShowScrollbar) addScrollbarPlugin()
+  } catch (error) {
+    console.error('初始化思维导图失败:', error)
   }
 }
 
@@ -128,21 +116,16 @@ onMounted(() => {
   showLoading()
   loadDataConfig()
   init()
+  usePlugins(mindMap)
   bindEvents()
 })
 
 onBeforeUnmount(() => {
-  unbindEvents()
-  mindMap.value.destroy()
+  if (mindMap.value) {
+    unbindEvents()
+    mindMap.value.destroy()
+  }
 })
-
-// 暴露给模板的方法
-// Object.assign(window, {
-//   execCommand,
-//   setData,
-//   exportMap,
-//   reRender,
-// })
 </script>
 
 <style lang="less" scoped>

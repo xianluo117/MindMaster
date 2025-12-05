@@ -20,7 +20,6 @@ import IconfontBtn from './IconfontBtn.vue'
 const { mindMap } = defineProps({
   mindMap: {
     type: Object,
-    required: true,
   },
 })
 

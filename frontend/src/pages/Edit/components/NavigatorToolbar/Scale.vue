@@ -3,8 +3,8 @@
     <t-tooltip :content="$t('scale.title')">
       <t-input-number
         v-model="currValue"
-        :max="1000"
-        :min="20"
+        :max="inputMax"
+        :min="inputMin"
         :format="(v) => `${v} %`"
         size="small"
         :allowInputOverLimit="false"
@@ -19,22 +19,49 @@
 </template>
 
 <script setup>
-import { ref, computed, onBeforeUnmount } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 
 const { mindMap } = defineProps({
   mindMap: {
     type: Object,
-    required: true,
   },
 })
 
 const currValue = ref(100)
 const prevValue = ref(100) // 上一次的值
+const inputMax = 400
+const inputMin = 20
 
+watch(
+  () => mindMap,
+  (val, oldVal) => {
+    // 只在 mindMap 从 null 变为实际对象（初始化后）时执行逻辑
+    if (val && !oldVal) {
+      currValue.value = toFixedNum(mindMap.view.scale)
+      // 画布放大缩小事件
+      mindMap.on('scale', onScale)
+      // 画布的单击事件
+      // mindMap.on('draw_click', onDrawClick)
+    }
+  },
+)
+
+onBeforeUnmount(() => {
+  if (mindMap) {
+    mindMap.off('scale', onScale)
+    // mindMap.off('draw_click', onDrawClick)
+  }
+})
+
+/** 缩放地图并回到中心 */
+const scaleToCenter = (num) => {
+  mindMap.view.setScale(num / 100)
+  mindMap.renderer.setRootNodeCenter()
+}
 /** 值变化事件 */
 const handleChange = (value, { type }) => {
   if (type === 'add' || type === 'reduce') {
-    mindMap.view.setScale(value / 100)
+    scaleToCenter(value)
     prevValue.value = value
   }
   // if (type === 'add') {
@@ -58,38 +85,31 @@ const handleChange = (value, { type }) => {
 }
 
 const handleEnter = (value) => {
-  console.log('用户按下了回车键', prevValue.value, value)
-  if (value > prevValue.value) {
-    enlarge()
-  } else if (value < prevValue.value) {
-    narrow()
+  // 如果输入小数，自动保留整数部分
+  currValue.value = Math.floor(value)
+  if (currValue.value < inputMin || currValue.value > inputMax) {
+    // 输入非法值，恢复之前的值
+    currValue.value = prevValue.value
+  } else {
+    // const cx = mindMap.width / 2
+    // const cy = mindMap.height / 2
+    scaleToCenter(currValue.value)
   }
-  prevValue.value = value
 }
-
 const handleFocus = (value) => {
   // 输入框focus时记录当前值
   prevValue.value = value.replace(/ %$/, '')
 }
-const toPer = (scale) => {
-  return (scale * 100).toFixed(0)
+/** 缩放倍数*100再四舍五入到整数 */
+const toFixedNum = (scale) => {
+  return Number((scale * 100).toFixed(0))
 }
-const narrow = () => {
-  mindMap.view.narrow()
+const onScale = (scale) => {
+  currValue.value = toFixedNum(scale)
 }
-const enlarge = () => {
-  mindMap.view.enlarge()
-}
-const onScaleNumChange = () => {
-  const num = Number(scaleNum.value)
-  if (Number.isNaN(num) || num <= 0) {
-    scaleNum.value = cacheScaleNum.value
-  } else {
-    const cx = props.mindMap.width / 2
-    const cy = props.mindMap.height / 2
-    props.mindMap.view.setScale(scaleNum.value / 100, cx, cy)
-  }
-}
+// const onDrawClick = () => {
+//   console.log('画布被单击了')
+// }
 </script>
 
 <style lang="less" scoped>

@@ -1,11 +1,20 @@
 <template>
-  <div class="navigatorContainer customScrollbar">
+  <div class="navigatorContainer">
     <!-- 回到根节点 -->
     <div class="item">
       <IconBtn
         name="backToRoot"
         :content="$t('navigatorToolbar.backToRoot')"
         :icon="FocusIcon"
+        :handleClick="handleIconClick"
+      />
+    </div>
+    <!-- 回到根节点 -->
+    <div class="item">
+      <IconBtn
+        name="fitToCanvas"
+        :content="$t('navigatorToolbar.fitToCanvas')"
+        :icon="FullscreenExitIcon"
         :handleClick="handleIconClick"
       />
     </div>
@@ -27,7 +36,9 @@
       <IconBtn
         name="toggleMiniMap"
         :content="
-          openMiniMap ? $t('navigatorToolbar.closeMiniMap') : $t('navigatorToolbar.openMiniMap')
+          openMiniMap
+            ? $t('navigatorToolbar.closeMiniMap')
+            : $t('navigatorToolbar.openMiniMap')
         "
         :icon="openMiniMap ? CompassFilledIcon : CompassIcon"
         :handleClick="handleIconClick"
@@ -38,7 +49,9 @@
       <IconBtn
         name="readonlyChange"
         :content="
-          appStore.isReadonly ? $t('navigatorToolbar.edit') : $t('navigatorToolbar.readonly')
+          appStore.isReadonly
+            ? $t('navigatorToolbar.edit')
+            : $t('navigatorToolbar.readonly')
         "
         :icon="appStore.isReadonly ? BrowseIcon : EditIcon"
         :handleClick="handleIconClick"
@@ -66,57 +79,27 @@
     <div class="item">
       <Scale :mindMap="mindMap" />
     </div>
-    <!-- 
     <div class="item">
-      <div
-        class="btn iconfont"
-        :class="[isDark ? 'iconmoon_line' : 'iconlieri']"
-        @click="toggleDark"
-      ></div>
+      <Demonstrate :mindMap="mindMap" />
     </div>
-    <div class="item">
-      <Demonstrate :isDark="isDark" :mindMap="mindMap"></Demonstrate>
+
+    <div class="footer">
+      版本号：{{ appConfig.appVer }} © {{ appConfig.author }}
     </div>
-    <div class="item">
-      <t-dropdown @command="handleCommand">
-        <div class="btn iconfont icongengduo"></div>
-        <t-dropdown-menu>
-          <t-dropdown-item value="shortcutKey">
-            <span class="iconfont iconjianpan"></span>
-            快捷键
-          </t-dropdown-item>
-          <t-dropdown-item value="aiChat">
-            <span class="iconfont iconAIshengcheng"></span>
-            AI
-          </t-dropdown-item>
-          <t-dropdown-item value="client">
-            <span class="iconfont iconxiazai"></span>
-            下载客户端
-          </t-dropdown-item>
-          <t-dropdown-item value="github">
-            <span class="iconfont icongithub"></span>
-            Github
-          </t-dropdown-item>
-          <t-dropdown-item value="site">
-            <span class="iconfont iconwangzhan"></span>
-            官网
-          </t-dropdown-item>
-          <t-dropdown-item value="version" disabled> 当前版本v{{ version }} </t-dropdown-item>
-        </t-dropdown-menu>
-      </t-dropdown>
-    </div> -->
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import appStore from '@/stores'
-import Scale from './Scale.vue'
-import MouseAction from './MouseAction.vue'
-import Demonstrate from './Demonstrate.vue'
-import pkg from 'simple-mind-map/package.json'
+import { ref, onMounted } from "vue";
+import appStore from "@/stores";
+import Scale from "./Scale.vue";
+import { appConfig } from "@/config";
+import MouseAction from "./MouseAction.vue";
+import Demonstrate from "./Demonstrate.vue";
+// import pkg from "simple-mind-map/package.json";
 import {
   FocusIcon,
+  FullscreenExitIcon,
   SearchIcon,
   CompassIcon,
   CompassFilledIcon,
@@ -124,119 +107,123 @@ import {
   BrowseIcon,
   Fullscreen2Icon,
   Fullscreen1Icon,
-} from 'tdesign-icons-vue-next'
-import IconBtn from './IconBtn.vue'
-import emitter from '@/utils/eventBus'
-import { fullscreenEvent, fullScreen } from '@/utils'
+} from "tdesign-icons-vue-next";
+import IconBtn from "./IconBtn.vue";
+import emitter from "@/utils/eventBus";
+import { fullscreenEvent, fullScreen } from "@/utils";
 
 const { mindMap } = defineProps({
   mindMap: {
     type: Object,
-    required: true,
   },
-})
+});
 
-// 响应式数据
-const version = ref(pkg.version)
-const openMiniMap = ref(false)
+const openMiniMap = ref(false);
 
 const iconBtnActions = {
   backToRoot: () => {
-    mindMap.renderer.setRootNodeCenter()
+    mindMap.renderer.setRootNodeCenter();
+  },
+  fitToCanvas: () => {
+    mindMap.view.fit();
   },
   showSearch: () => {
-    emitter.emit('show_search')
+    emitter.emit("show_search");
   },
   toggleMiniMap() {
-    openMiniMap.value = !openMiniMap.value
-    emitter.emit('toggle_mini_map', openMiniMap.value)
+    openMiniMap.value = !openMiniMap.value;
+    emitter.emit("toggle_mini_map", openMiniMap.value);
   },
   readonlyChange() {
-    appStore.setIsReadonly(!appStore.isReadonly)
-    mindMap.setMode(appStore.isReadonly ? 'readonly' : 'edit')
+    appStore.setIsReadonly(!appStore.isReadonly);
+    mindMap.setMode(appStore.isReadonly ? "readonly" : "edit");
   },
   fullscreenShow() {
-    fullScreen(mindMap.el)
+    fullScreen(mindMap.el);
   },
   fullscreenEdit() {
-    fullScreen(document.body)
+    fullScreen(document.body);
   },
-}
+};
 
 const handleIconClick = (name) => {
-  const action = iconBtnActions[name]
+  const action = iconBtnActions[name];
   if (action) {
-    action()
+    action();
   } else {
-    console.warn(`未知的按钮类型: ${name}`)
+    console.warn(`未知的按钮类型: ${name}`);
   }
-}
+};
 
 // 方法
 const readonlyChange = () => {
-  appStore.setIsReadonly(!isReadonly.value)
-  mindMap.setMode(isReadonly.value ? 'readonly' : 'edit')
-}
+  appStore.setIsReadonly(!isReadonly.value);
+  mindMap.setMode(isReadonly.value ? "readonly" : "edit");
+};
 
 const showSearch = () => {
-  mindMap.bus.$emit('show_search')
-}
+  mindMap.bus.$emit("show_search");
+};
 
 const toggleDark = () => {
   appStore.setLocalConfig({
     isDark: !isDark.value,
-  })
-}
+  });
+};
 
 const handleCommand = (value) => {
-  if (value === 'shortcutKey') {
-    appStore.setActiveSidebar('shortcutKey')
-    return
-  } else if (value === 'aiChat') {
-    appStore.setActiveSidebar('ai')
-    return
-  } else if (value === 'client') {
-    mindMap.bus.$emit('showDownloadTip', '下载客户端', '支持Windows、Mac、Linux系统')
-    return
+  if (value === "shortcutKey") {
+    appStore.setActiveSidebar("shortcutKey");
+    return;
+  } else if (value === "aiChat") {
+    appStore.setActiveSidebar("ai");
+    return;
+  } else if (value === "client") {
+    mindMap.bus.$emit(
+      "showDownloadTip",
+      "下载客户端",
+      "支持Windows、Mac、Linux系统"
+    );
+    return;
   }
 
-  let url = ''
+  let url = "";
   switch (value) {
-    case 'github':
-      url = 'https://github.com/wanglin2/mind-map'
-      break
-    case 'helpDoc':
-      url = 'https://wanglin2.github.io/mind-map-docs/help/help1.html'
-      break
-    case 'devDoc':
-      url = 'https://wanglin2.github.io/mind-map-docs/start/introduction.html'
-      break
-    case 'site':
-      url = 'https://wanglin2.github.io/mind-map-docs/'
-      break
-    case 'issue':
-      url = 'https://github.com/wanglin2/mind-map/issues/new'
-      break
+    case "github":
+      url = "https://github.com/wanglin2/mind-map";
+      break;
+    case "helpDoc":
+      url = "https://wanglin2.github.io/mind-map-docs/help/help1.html";
+      break;
+    case "devDoc":
+      url = "https://wanglin2.github.io/mind-map-docs/start/introduction.html";
+      break;
+    case "site":
+      url = "https://wanglin2.github.io/mind-map-docs/";
+      break;
+    case "issue":
+      url = "https://github.com/wanglin2/mind-map/issues/new";
+      break;
     default:
-      break
+      break;
   }
 
   if (url) {
-    const a = document.createElement('a')
-    a.href = url
-    a.target = '_blank'
-    a.click()
+    const a = document.createElement("a");
+    a.href = url;
+    a.target = "_blank";
+    a.click();
   }
-}
+};
 
 onMounted(() => {
   // 组件挂载时添加全屏事件监听
   document[fullscreenEvent] = () => {
     setTimeout(() => {
-      props.mindMap.resize()
-    }, 1000)
-  }
-})
+      mindMap.resize();
+    }, 1000);
+  };
+});
 </script>
 
 <style lang="less" scoped>
@@ -266,6 +253,10 @@ onMounted(() => {
       cursor: pointer;
       font-size: 18px;
     }
+  }
+  .footer {
+    font-size: 12px;
+    color: #606266;
   }
 }
 

@@ -203,6 +203,7 @@ export default {
     readonly: '切换为只读模式',
     edit: '切换为编辑模式',
     backToRoot: '回到根节点',
+    fitToCanvas: '缩放至适应画布',
     showSearch: '搜索节点内容',
     changeSourceCodeEdit: '切换为源码编辑模式',
     shortcutKeys: '快捷键',

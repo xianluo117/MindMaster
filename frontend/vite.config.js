@@ -6,12 +6,18 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { defineConfig } from 'vite'
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
     vueJsx(),
+    // 添加 node polyfills 插件
+    nodePolyfills({
+      // 要进行 polyfill 的模块
+      protocolImports: true,
+    }),
     AutoImport({
       resolvers: [
         TDesignResolver({
@@ -31,6 +37,5 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
-    // extensions: ['.vue', '.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json'], // 添加 '.vue' 到可省略后缀列表
   },
 })

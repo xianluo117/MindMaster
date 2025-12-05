@@ -9,6 +9,7 @@ import MindMap from 'simple-mind-map'
 import exampleData from 'simple-mind-map/example/exampleData'
 import { ref } from 'vue'
 import { DialogPlugin, MessagePlugin } from 'tdesign-vue-next'
+import { useRoute } from 'vue-router'
 
 // 注册插件
 import Themes from 'simple-mind-map-plugin-themes'
@@ -59,24 +60,30 @@ Themes.init(MindMap)
 /**
  * 主要用于思维导图的加载、初始化、数据存储等功能
  * @param {Ref<object>} mindMapRef
- * @param {Ref<boolean>} openNodeRichText
  * @returns
  */
-export default function useMindMap(mindMapRef, openNodeRichText) {
+export default function useMindMap(mindMapRef) {
+  const route = useRoute()
   const mindMap = ref(null)
   const mindMapData = ref(null)
   const mindMapConfig = ref({})
   const storeConfigTimer = ref(null)
 
+  /** url中是否存在要打开的文件 */
+  const hasFileURL = () => {
+    const fileURL = route.query.fileURL
+    if (!fileURL) return false
+    return /\.(smm|json|xmind|md|xlsx)$/.test(fileURL)
+  }
   /**
    * 初始化思维导图。⚠️这里只做思维导图相关的初始化，其他初始化在index.vue的init函数中
-   * @param {boolean} hasFileURL - 是否存在文件URL
    */
-  const initMindMap = (hasFileURL) => {
+  const initMindMap = () => {
+    const fileUrlExists = hasFileURL()
     let { root, layout, theme, view } = mindMapData.value
     const config = mindMapConfig.value
     // 如果url中存在要打开的文件，那么思维导图数据、主题、布局都使用默认的
-    if (hasFileURL) {
+    if (fileUrlExists) {
       root = {
         data: {
           text: '根节点',
@@ -193,7 +200,6 @@ export default function useMindMap(mindMapRef, openNodeRichText) {
         })
       },
     })
-
     // 绑定快捷键
     mindMap.value.keyCommand.addShortcut('Control+s', () => {
       manualSave()
@@ -236,7 +242,10 @@ export default function useMindMap(mindMapRef, openNodeRichText) {
       })
     })
     bindSaveEvent()
-    return mindMap.value
+    // 解析url中的文件
+    if (fileUrlExists) {
+      emitter.emit('handle_file_url')
+    }
   }
 
   /** 加载数据和配置 */
