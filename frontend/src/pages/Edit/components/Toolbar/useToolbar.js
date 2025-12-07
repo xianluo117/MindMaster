@@ -20,7 +20,13 @@ import {
   Transform1Icon,
   TextboxIcon,
   LogoAdobeIllustrateIcon,
+  SaveIcon,
+  FileImportIcon,
+  FileExportIcon,
 } from "tdesign-icons-vue-next";
+import { getData } from "@/api";
+import { LoadingPlugin } from "tdesign-vue-next";
+import { t } from "@/locales";
 
 /**
  * 工具栏相关信息hooks
@@ -32,6 +38,14 @@ export default function useToolbar(btnList) {
   const forwardEnd = ref(true);
   const readonly = ref(false);
   const isInPainter = ref(false); // 格式刷
+
+  const fileTreeVisible = ref(false);
+  const rootDirName = ref("");
+  const fileTreeExpand = ref(true);
+  const waitingWriteToLocalFile = ref(false);
+  const isFullDataFile = ref(false);
+
+  let fileHandle = null;
 
   const hasRoot = computed(() => {
     return activeNodes.value.findIndex((node) => node.isRoot) !== -1;
@@ -48,10 +62,8 @@ export default function useToolbar(btnList) {
     return index !== -1 && index < btnList.length - 1;
   });
 
-  /**
-   * 默认按钮列表
-   */
-  const defaultBtnList = computed(() => [
+  /** 左侧按钮列表 */
+  const leftBtnList = computed(() => [
     {
       name: "back",
       icon: RollbackIcon,
@@ -157,13 +169,13 @@ export default function useToolbar(btnList) {
       disabled: activeNodes.value.length <= 0 || hasGeneralization.value,
       handler: () => showFormulaSidebar,
     },
-    {
-      name: "attachment",
-      icon: AttachIcon,
-      label: "附件",
-      disabled: activeNodes.value.length <= 0 || hasGeneralization.value,
-      handler: () => selectAttachmentFile,
-    },
+    // {
+    //   name: "attachment",
+    //   icon: AttachIcon,
+    //   label: "附件",
+    //   disabled: activeNodes.value.length <= 0 || hasGeneralization.value,
+    //   handler: () => selectAttachmentFile,
+    // },
     {
       name: "outerFrame",
       icon: Transform1Icon,
@@ -184,6 +196,28 @@ export default function useToolbar(btnList) {
       disabled: hasGeneralization.value,
       //TODO ai功能待实现
       handler: () => {},
+    },
+  ]);
+
+  /** 右侧按钮列表 */
+  const rightBtnList = computed(() => [
+    {
+      name: "saveLocalFile",
+      icon: SaveIcon,
+      label: "另存为",
+      handler: saveLocalFile,
+    },
+    {
+      name: "showImport",
+      icon: FileImportIcon,
+      label: "导入",
+      handler: () => emitter.emit("showImport"),
+    },
+    {
+      name: "showExport",
+      icon: FileExportIcon,
+      label: "导出",
+      handler: () => emitter.emit("showExport"),
     },
   ]);
 
@@ -219,10 +253,11 @@ export default function useToolbar(btnList) {
 
   /**
    * 监听前进后退
-   * @param {number} index - 当前索引
-   * @param {number} len - 总长度
+   * @param {number} index - activeHistoryIndex（当前在历史数据数组里的索引）
+   * @param {number} len - length（当前历史数据数组的长度）
    */
   const onBackForward = (index, len) => {
+    console.log("onBackForward", index, len);
     backEnd.value = index <= 0;
     forwardEnd.value = index >= len - 1;
   };
@@ -230,29 +265,97 @@ export default function useToolbar(btnList) {
   const onPainterStart = () => (isInPainter.value = true);
   /** 结束格式刷 */
   const onPainterEnd = () => (isInPainter.value = false);
-  /**
-   * 设置事件监听器并返回清理函数
-   * @returns {Function} 清理函数，用于移除事件监听器
-   */
+
+  /** 写入本地文件 */
+  const writeLocalFile = async (content) => {
+    if (!fileHandle || !appStore.isHandleLocalFile) {
+      waitingWriteToLocalFile.value = false;
+      return;
+    }
+    if (!isFullDataFile.value) {
+      content = content.root;
+    }
+    let string = JSON.stringify(content);
+    const writable = await fileHandle.createWritable();
+    await writable.write(string);
+    await writable.close();
+    waitingWriteToLocalFile.value = false;
+  };
+  /** 另存为 */
+  const saveLocalFile = async () => await createLocalFile(getData());
+  /** 创建本地文件 */
+  const createLocalFile = async (content) => {
+    try {
+      let _fileHandle = await window.showSaveFilePicker({
+        types: [
+          {
+            description: "",
+            accept: { "application/json": [".smm"] },
+          },
+        ],
+        suggestedName: t("toolbar.defaultFileName"),
+      });
+      if (!_fileHandle) {
+        return;
+      }
+      const loading = LoadingPlugin({
+        text: t("toolbar.creatingTip"),
+      });
+      fileHandle = _fileHandle;
+      appStore.setIsHandleLocalFile(true);
+      isFullDataFile.value = true;
+      await writeLocalFile(content);
+      await readFile();
+      loading.hide();
+    } catch (error) {
+      console.error(error);
+      if (error.toString().includes("aborted")) {
+        return;
+      }
+      MessagePlugin.warning(t("toolbar.notSupportTip"));
+    }
+  };
+
+  let timer = null;
+  /** 监听本地文件读写 */
+  const onWriteLocalFile = (content) => {
+    clearTimeout(timer);
+    if (fileHandle && appStore.isHandleLocalFile) {
+      waitingWriteToLocalFile.value = true;
+    }
+    timer = setTimeout(() => {
+      writeLocalFile(content);
+    }, 1000);
+  };
+  /** 节点备注双击处理 */
+  const onNodeNoteDblclick = (node, e) => {
+    e.stopPropagation();
+    emitter.emit("showNodeNote", node);
+  };
+
   const setEventHandler = () => {
     emitter.on("mode_change", onModeChange);
     emitter.on("node_active", onNodeActive);
     emitter.on("back_forward", onBackForward);
     emitter.on("painter_start", onPainterStart);
     emitter.on("painter_end", onPainterEnd);
+    emitter.on("node_note_dblclick", onNodeNoteDblclick);
+    emitter.on("write_local_file", onWriteLocalFile);
   };
-
   const removeEventHandler = () => {
     emitter.off("mode_change", onModeChange);
     emitter.off("node_active", onNodeActive);
     emitter.off("back_forward", onBackForward);
     emitter.off("painter_start", onPainterStart);
     emitter.off("painter_end", onPainterEnd);
+    emitter.off("node_note_dblclick", onNodeNoteDblclick);
+    emitter.off("write_local_file", onWriteLocalFile);
   };
 
   // 暴露需要的值和方法
   return {
-    defaultBtnList,
+    leftBtnList,
+    rightBtnList,
     // 状态
     activeNodes,
     backEnd,

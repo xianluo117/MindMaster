@@ -20,4 +20,6 @@ const i18n = createI18n({
   globalInjection: true  // 全局注入 $t 方法
 })
 
+// 导出全局 t 函数，使用方直接导入即可使用
+export const { t } = i18n.global
 export default i18n

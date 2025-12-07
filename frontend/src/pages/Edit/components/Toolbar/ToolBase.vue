@@ -32,11 +32,11 @@ const { name } = defineProps({
     type: Boolean,
     default: false,
   },
+  handleClick: {
+    type: Function,
+    required: true,
+  },
 })
-const emit = defineEmits(['toolClick'])
-const handleClick = () => {
-  emit('toolClick', name)
-}
 </script>
 
 <style lang="less" scoped>

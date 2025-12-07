@@ -2,17 +2,16 @@
   <div class="toolbarContainer">
     <div class="toolbar" ref="toolbarRef">
       <div class="toolbarBlock">
-        <!-- <ToolBtnsBar :btn-list="defaultBtnList" /> -->
-        <ToolBase v-for="item in defaultBtnList" :key="item.name" :icon="item.icon" :name="item.name"
-          :label="item.label" :isDisabled="item.disabled" :isActive="item.name === 'painter' ? isInPainter : false"
-          @tool-click="(name) => (name === 'painter' ? (isInPainter = !isInPainter) : '')" />
+        <!-- <ToolBtnsBar :btn-list="leftBtnList" /> -->
+        <ToolBase v-for="item in leftBtnList" :key="item.name" :icon="item.icon" :name="item.name" :label="item.label"
+          :isDisabled="item.disabled" :isActive="item.name === 'painter' ? isInPainter : false"
+          :handleClick="item.handler" />
       </div>
 
       <div class="toolbarBlock">
-        <!-- <ToolBtnsBar :btn-list="defaultBtnList.slice(0, 6)" /> -->
-        <ToolBase v-for="item in defaultBtnList.slice(0, 6)" :key="item.name" :icon="item.icon" :name="item.name"
-          :label="item.label" :isDisabled="item.disabled" :isActive="item.name === 'painter' ? isInPainter : false"
-          @tool-click="(name) => (name === 'painter' ? (isInPainter = !isInPainter) : '')" />
+        <!-- <ToolBtnsBar :btn-list="leftBtnList.slice(0, 6)" /> -->
+        <ToolBase v-for="item in rightBtnList" :key="item.name" :icon="item.icon" :name="item.name" :label="item.label"
+          :handleClick="item.handler" />
       </div>
     </div>
   </div>
@@ -33,7 +32,6 @@ import useToolbar from './useToolbar.js'
 
 const toolbarRef = ref(null)
 
-let fileHandle = null
 const isMobile = ref(isMobileUtil())
 const horizontalList = ref([])
 const verticalList = ref([])
@@ -44,14 +42,10 @@ const fileTreeProps = ref({
   children: 'children',
   isLeaf: 'leaf',
 })
-const fileTreeVisible = ref(false)
-const rootDirName = ref('')
-const fileTreeExpand = ref(true)
-const waitingWriteToLocalFile = ref(false)
-const isFullDataFile = ref(false)
 
 const {
-  defaultBtnList,
+  leftBtnList,
+  rightBtnList,
   // 状态
   activeNodes,
   backEnd,
@@ -73,7 +67,7 @@ const {
 } = useToolbar()
 
 const btnList = computed(() => {
-  let res = defaultBtnList.value.map(item => item.name)
+  let res = leftBtnList.value.map(item => item.name)
   if (!appStore.localConfig.openNodeRichText) {
     res = res.filter((item) => {
       return item !== 'formula'
@@ -114,17 +108,6 @@ const computeToolbarShow = () => {
   loopCheck()
 }
 
-let timer = null
-/** 监听本地文件读写 */
-const onWriteLocalFile = (content) => {
-  clearTimeout(timer)
-  if (fileHandle && appStore.isHandleLocalFile) {
-    waitingWriteToLocalFile.value = true
-  }
-  timer = setTimeout(() => {
-    writeLocalFile(content)
-  }, 1000)
-}
 /** 页面卸载前的处理 */
 const onUnload = (e) => {
   if (waitingWriteToLocalFile.value) {
@@ -277,61 +260,9 @@ const setData = (str) => {
     MessagePlugin.error(t('toolbar.fileOpenFailed'))
   }
 }
-/** 写入本地文件 */
-const writeLocalFile = async (content) => {
-  if (!fileHandle || !appStore.isHandleLocalFile) {
-    waitingWriteToLocalFile.value = false
-    return
-  }
-  if (!isFullDataFile.value) {
-    content = content.root
-  }
-  let string = JSON.stringify(content)
-  const writable = await fileHandle.createWritable()
-  await writable.write(string)
-  await writable.close()
-  waitingWriteToLocalFile.value = false
-}
 /** 创建本地文件 */
 const createNewLocalFile = async () => {
   await createLocalFile(exampleData)
-}
-/** 另存为 */
-const saveLocalFile = async () => {
-  let data = getData()
-  await createLocalFile(data)
-}
-/** 创建本地文件 */
-const createLocalFile = async (content) => {
-  try {
-    let _fileHandle = await window.showSaveFilePicker({
-      types: [
-        {
-          description: '',
-          accept: { 'application/json': ['.smm'] }
-        }
-      ],
-      suggestedName: t('toolbar.defaultFileName')
-    })
-    if (!_fileHandle) {
-      return
-    }
-    const loading = LoadingPlugin({
-      text: t('toolbar.creatingTip')
-    })
-    fileHandle = _fileHandle
-    appStore.setIsHandleLocalFile(true)
-    isFullDataFile.value = true
-    await writeLocalFile(content)
-    await readFile()
-    loading.hide()
-  } catch (error) {
-    console.error(error)
-    if (error.toString().includes('aborted')) {
-      return
-    }
-    MessagePlugin.warning(t('toolbar.notSupportTip'))
-  }
 }
 /** 节点备注双击处理 */
 const onNodeNoteDblclick = (node, e) => {
@@ -354,8 +285,8 @@ onMounted(() => {
   window.addEventListener('resize', computeToolbarShowThrottle)
   // emitter.on('lang_change', computeToolbarShowThrottle)
   window.addEventListener('beforeunload', onUnload)
-  emitter.on('node_note_dblclick', onNodeNoteDblclick)
-  emitter.on('write_local_file', onWriteLocalFile)
+  // emitter.on('node_note_dblclick', onNodeNoteDblclick)
+  // emitter.on('write_local_file', onWriteLocalFile)
   setEventHandler()
 })
 
@@ -363,8 +294,8 @@ onBeforeUnmount(() => {
   window.removeEventListener('resize', computeToolbarShowThrottle)
   // emitter.off('lang_change', computeToolbarShowThrottle)
   window.removeEventListener('beforeunload', onUnload)
-  emitter.off('node_note_dblclick', onNodeNoteDblclick)
-  emitter.off('write_local_file', onWriteLocalFile)
+  // emitter.off('node_note_dblclick', onNodeNoteDblclick)
+  // emitter.off('write_local_file', onWriteLocalFile)
   removeEventHandler()
 })
 </script>
@@ -384,11 +315,11 @@ onBeforeUnmount(() => {
       PingFang SC;
     font-weight: 400;
     color: rgba(26, 26, 26, 0.8);
-    z-index: 6666;
+    z-index: 2;
 
     .toolbarBlock {
       display: flex;
-      background-color: transparent;
+      background-color: #fff;
       gap: 4px; // 图标按钮间隔
       padding: 10px 20px;
       border-radius: 6px;
