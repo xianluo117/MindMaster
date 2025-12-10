@@ -73,7 +73,9 @@ export default function useMindMap(mindMapRef) {
   const hasFileURL = () => {
     const fileURL = route.query.fileURL
     if (!fileURL) return false
-    return /\.(smm|json|xmind|md|xlsx)$/.test(fileURL)
+    // return /\.(smm|json|xmind|md|xlsx)$/.test(fileURL)
+    //TODO ImportFile组件中只检查以下四种格式，没有xlsx
+    return /\.(smm|json|xmind|md)$/.test(fileURL)
   }
   /**
    * 初始化思维导图。⚠️这里只做思维导图相关的初始化，其他初始化在index.vue的init函数中
@@ -242,7 +244,7 @@ export default function useMindMap(mindMapRef) {
       })
     })
     bindSaveEvent()
-    // 解析url中的文件
+    // 处理url中支持格式的文件
     if (fileUrlExists) {
       emitter.emit('handle_file_url')
     }

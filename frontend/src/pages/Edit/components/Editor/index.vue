@@ -1,184 +1,125 @@
+<!-- pages/Edit/Edit.vue -->
 <template>
-  <div
-    class="editor-container"
-    @dragenter.stop.prevent="handleDragEnter"
-    @dragleave.stop.prevent="handleDragLeave"
-    @dragover.stop.prevent="handleDragOver"
-    @drop.stop.prevent="handleDrop"
-  >
+  <div class="editContainer" @dragenter.stop.prevent="onDragEnter" @dragleave.stop.prevent @dragover.stop.prevent
+    @drop.stop.prevent>
     <div class="mindMapContainer" id="mindMapContainer" ref="mindMapRef"></div>
 
-    <Count v-if="!isZenMode" :mindMap="mindMap" />
-    <NavigatorToolbar v-if="!isZenMode" :mindMap="mindMap" />
-    <!-- <Navigator v-if="mindMap" :mindMap="mindMap"></Navigator>
-    <OutlineSidebar :mindMap="mindMap"></OutlineSidebar>
-    <Style v-if="mindMap && !editorState.isZenMode" :mindMap="mindMap"></Style>
-    <BaseStyle :data="mindMapData" :configData="mindMapConfig" :mindMap="mindMap"></BaseStyle>
-    <AssociativeLineStyle v-if="mindMap" :mindMap="mindMap"></AssociativeLineStyle>
-    <Theme v-if="mindMap" :data="mindMapData" :mindMap="mindMap"></Theme>
-    <Structure :mindMap="mindMap"></Structure>
-    <ShortcutKey></ShortcutKey>
-    <Contextmenu v-if="mindMap" :mindMap="mindMap"></Contextmenu>
-    <RichTextToolbar v-if="mindMap" :mindMap="mindMap"></RichTextToolbar>
-    <NodeNoteContentShow v-if="mindMap" :mindMap="mindMap"></NodeNoteContentShow>
-    <NodeImgPreview v-if="mindMap" :mindMap="mindMap"></NodeImgPreview>
-    <SidebarTrigger v-if="!editorState.isZenMode"></SidebarTrigger>
-    <Search v-if="mindMap" :mindMap="mindMap"></Search>
-    <NodeIconSidebar v-if="mindMap" :mindMap="mindMap"></NodeIconSidebar>
-    <NodeIconToolbar v-if="mindMap" :mindMap="mindMap"></NodeIconToolbar>
-    <OutlineEdit v-if="mindMap" :mindMap="mindMap"></OutlineEdit>
-    <Scrollbar v-if="isShowScrollbar && mindMap" :mindMap="mindMap"></Scrollbar>
-    <FormulaSidebar v-if="mindMap" :mindMap="mindMap"></FormulaSidebar>
-    <NodeOuterFrame v-if="mindMap" :mindMap="mindMap"></NodeOuterFrame>
-    <NodeTagStyle v-if="mindMap" :mindMap="mindMap"></NodeTagStyle>
-    <Setting :configData="mindMapConfig" :mindMap="mindMap"></Setting>
-    <NodeImgPlacementToolbar v-if="mindMap" :mindMap="mindMap"></NodeImgPlacementToolbar>
-    <NodeNoteSidebar v-if="mindMap" :mindMap" :mindMap="mindMap"></NodeNoteSidebar>
-    <AiCreate v-if="mindMap && editorState.enableAi" :mindMap="mindMap"></AiCreate>
-    <AiChat v-if="editorState.enableAi"></AiChat> -->
+    <Count v-if="!appStore.localConfig.isZenMode" :mindMap="mindMap" />
+    <Navigator v-if="mindMap" :mindMap="mindMap" />
+    <NavigatorToolbar v-if="!appStore.localConfig.isZenMode" :mindMap="mindMap" />
 
     <!-- 拖拽遮罩 -->
-    <div
-      class="dragMask"
-      v-if="showDragMask"
-      @dragleave.stop.prevent="onDragLeave"
-      @dragover.stop.prevent
-      @drop.stop.prevent="onDrop"
-    >
+    <div class="dragMask" v-if="showDragMask" @dragleave.stop.prevent="onDragLeave" @dragover.stop.prevent
+      @drop.stop.prevent="onDrop">
       <div class="dragTip">{{ $t('edit.dragTip') }}</div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, watch, ref, computed } from 'vue'
-import emitter from '@/utils/eventBus.js'
-import { showLoading } from '@/utils/loading'
-import MindMap from 'simple-mind-map'
 import appStore from '@/stores'
-import usePluginManager from './usePluginManager.js'
-import useMindMapCore from './useMindMapCore.js'
-import useMindMapActions from './useMindMapActions.js'
-import useDragAndDrop from './useDragAndDrop.js'
-import Count from '@/pages/Edit/components/Count/index.vue'
-import NavigatorToolbar from '@/pages/Edit/components/NavigatorToolbar/index.vue'
+import { showLoading } from '@/utils/loading'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 
-// 核心状态
-// const mindMap = ref(null)
+// 导入所有UI组件
+import Count from '../Count/index.vue'
+import Navigator from '../Navigator/index.vue'
+import NavigatorToolbar from '../NavigatorToolbar/index.vue'
+// import OutlineSidebar from './components/OutlineSidebar.vue'
+// import Style from './components/Style.vue'
+// import BaseStyle from './components/BaseStyle.vue'
+// import AssociativeLineStyle from './components/AssociativeLineStyle.vue'
+// import Theme from './components/Theme.vue'
+// import Structure from './components/Structure.vue'
+// import ShortcutKey from './components/ShortcutKey.vue'
+// import Contextmenu from './components/Contextmenu.vue'
+// import RichTextToolbar from './components/RichTextToolbar.vue'
+// import NodeNoteContentShow from './components/NodeNoteContentShow.vue'
+// import NodeImgPreview from './components/NodeImgPreview.vue'
+// import SidebarTrigger from './components/SidebarTrigger.vue'
+// import Search from './components/Search.vue'
+// import NodeIconSidebar from './components/NodeIconSidebar.vue'
+// import NodeIconToolbar from './components/NodeIconToolbar.vue'
+// import OutlineEdit from './components/OutlineEdit.vue'
+// import Scrollbar from './components/Scrollbar.vue'
+// import FormulaSidebar from './components/FormulaSidebar.vue'
+// import NodeOuterFrame from './components/NodeOuterFrame.vue'
+// import NodeTagStyle from './components/NodeTagStyle.vue'
+// import Setting from './components/Setting.vue'
+// import NodeImgPlacementToolbar from './components/NodeImgPlacementToolbar.vue'
+// import NodeNoteSidebar from './components/NodeNoteSidebar.vue'
+// import AiCreate from './components/AiCreate.vue'
+// import AiChat from './components/AiChat.vue'
+
+import useDragImport from './useDragImport'
+import useEventHandlers from './useEventHandlers'
+import useMindMap from './useMindMap'
+import usePlugins from './usePlugins'
+
 const mindMapRef = ref(null)
-// const mindMapData = ref(null)
-// const mindMapConfig = ref({})
-const isInitialized = ref(false)
-// === 状态管理 ===
-// 基础配置
-const isZenMode = computed(() => appStore.localConfig.isZenMode)
-const openNodeRichText = computed(() => appStore.localConfig.openNodeRichText)
-const isShowScrollbar = computed(() => appStore.localConfig.isShowScrollbar)
-const enableDragImport = computed(() => appStore.localConfig.enableDragImport)
-const useLeftKeySelectionRightKeyDrag = computed(
-  () => appStore.localConfig.useLeftKeySelectionRightKeyDrag,
-)
-const extraTextOnExport = computed(() => appStore.extraTextOnExport)
-const isDragOutlineTreeNode = computed(() => appStore.isDragOutlineTreeNode)
-const enableAi = computed(() => appStore.localConfig.enableAi)
 
-// 初始化插件管理
 const {
-  addRichTextPlugin,
-  removeRichTextPlugin,
-  addScrollbarPlugin,
-  removeScrollbarPlugin,
-  initPlugins,
-  getPluginManager,
-} = usePluginManager(MindMap, openNodeRichText, isShowScrollbar)
-
-// 初始化思维导图核心功能
-const { mindMap, mindMapData, mindMapConfig, getMindMapData, initMindMap, cleanup } =
-  useMindMapCore(MindMap, initPlugins, useLeftKeySelectionRightKeyDrag, extraTextOnExport)
-
-// 初始化思维导图操作方法
-const {
-  // 渲染控制
-  reRender,
-  handleResize,
-  // 命令执行
-  execCommand,
-  // 数据操作
+  mindMap,
+  mindMapData,
+  mindMapConfig,
+  loadDataConfig,
+  initMindMap,
   manualSave,
   setData,
-  // 导出功能
-  exportMindMap,
+  execCommand,
   onPaddingChange,
-  // 编辑器操作
-  handleStartTextEdit,
-  handleEndTextEdit,
-  handleCreateLineFromActiveNode,
-  handleStartPainter,
-  // 加载状态控制
-  handleShowLoading,
-  handleHideLoading,
-  // 错误处理
-  onLocalStorageExceeded,
-} = useMindMapActions(mindMap, openNodeRichText)
+  exportMap,
+  reRender,
+} = useMindMap(mindMapRef)
 
-// 初始化拖拽功能
+const { showDragMask, onDragEnter, onDragLeave, onDrop } = useDragImport()
+
+const { addRichTextPlugin, removeRichTextPlugin, addScrollbarPlugin, removeScrollbarPlugin } =
+  usePlugins(mindMap)
 const {
-  // 状态
-  showDragMask,
-  // 文件拖拽
-  onDragEnter,
-  onDragLeave,
-  onDrop,
-} = useDragAndDrop(enableDragImport, isDragOutlineTreeNode)
+  // handleStartTextEdit,
+  // handleEndTextEdit,
+  // handleCreateLineFromActiveNode,
+  // handleStartPainter,
+  // handleResize,
+  bindEvents,
+  unbindEvents,
+} = useEventHandlers(mindMap, manualSave)
 
-// === 生命周期钩子 ===
-onMounted(async () => {
+const init = () => {
+  try {
+    initMindMap()
+    // 加载插件
+    if (appStore.localConfig.openNodeRichText) addRichTextPlugin()
+    if (appStore.localConfig.isShowScrollbar) addScrollbarPlugin()
+  } catch (error) {
+    console.error('初始化思维导图失败:', error)
+  }
+}
+
+onMounted(() => {
   showLoading()
-  getMindMapData()
-  // const pluginManager = getPluginManager()
-  // pluginManager.setMindMapInstance(mindMap)
-  initMindMap(mindMapRef, manualSave)
-
-  // 监听事件
-  emitter.on('execCommand', execCommand)
-  emitter.on('paddingChange', onPaddingChange)
-  emitter.on('export', exportMindMap)
-  emitter.on('setData', setData)
-  emitter.on('startTextEdit', handleStartTextEdit)
-  emitter.on('endTextEdit', handleEndTextEdit)
-  emitter.on('createAssociativeLine', handleCreateLineFromActiveNode)
-  emitter.on('startPainter', handleStartPainter)
-  emitter.on('node_tree_render_end', handleHideLoading)
-  emitter.on('showLoading', handleShowLoading)
-  emitter.on('localStorageExceeded', onLocalStorageExceeded)
-  window.addEventListener('resize', handleResize)
+  loadDataConfig()
+  init()
+  usePlugins(mindMap)
+  bindEvents()
 })
 
-onUnmounted(() => {
-  // 移除事件监听
-  emitter.off('execCommand', execCommand)
-  emitter.off('paddingChange', onPaddingChange)
-  emitter.off('export', exportMindMap)
-  emitter.off('setData', setData)
-  emitter.off('startTextEdit', handleStartTextEdit)
-  emitter.off('endTextEdit', handleEndTextEdit)
-  emitter.off('createAssociativeLine', handleCreateLineFromActiveNode)
-  emitter.off('startPainter', handleStartPainter)
-  emitter.off('node_tree_render_end', handleHideLoading)
-  emitter.off('showLoading', handleShowLoading)
-  emitter.off('localStorageExceeded', onLocalStorageExceeded)
-  window.removeEventListener('resize', handleResize)
+onBeforeUnmount(() => {
+  if (mindMap.value) {
+    unbindEvents()
+    mindMap.value.destroy()
+  }
 })
 </script>
 
 <style lang="less" scoped>
-.editor-container {
+.editContainer {
   position: fixed;
   left: 0;
   right: 0;
   top: 0;
   bottom: 0;
-  background-color: aquamarine;
 
   .dragMask {
     position: absolute;

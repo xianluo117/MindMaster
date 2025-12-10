@@ -9,8 +9,7 @@
 
 <script setup>
 import Toolbar from './components/Toolbar/index.vue'
-import Editor from './components/EditorTest/index.vue'
-// import Editor from './components/Editor/index.vue'
+import Editor from './components/Editor/index.vue'
 import appStore from '@/stores'
 import { ref, onMounted } from 'vue'
 import { getLocalConfig } from '@/api'

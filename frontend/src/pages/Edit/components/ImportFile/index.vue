@@ -8,30 +8,19 @@
       destroyOnClose
       @close="cancel"
     >
+      <t-alert
+        theme="warning"
+        :message="$t('import.support') + supportFileStr + $t('import.file')"
+        :style="{ 'margin-bottom': '12px' }"
+      />
       <t-upload
         ref="upload"
-        action="x"
-        :accept="supportFileStr"
         :files="fileList"
+        :accept="supportFileStr"
         :autoUpload="false"
+        theme="file"
         :onChange="onChange"
-        :onRemove="onRemove"
-        :theme="display"
-        draggable
       >
-        <t-button
-          slot="trigger"
-          variant="outline"
-          theme="primary"
-        >
-          {{ $t("import.selectFile") }}
-        </t-button>
-        <template #tip>
-          <div class="t-upload__tip">
-            {{ $t("import.support") }}{{ supportFileStr
-            }}{{ $t("import.file") }}
-          </div>
-        </template>
       </t-upload>
       <template #footer>
         <t-button
@@ -88,10 +77,8 @@ import markdown from "simple-mind-map/src/parse/markdown.js";
 import appStore from "@/stores";
 import emitter from "@/utils/eventBus";
 
-// 路由实例
 const router = useRouter();
 
-// 响应式数据
 const dialogVisible = ref(false);
 const fileList = ref([]);
 const selectPromiseResolve = ref(null);
@@ -101,19 +88,16 @@ const canvasList = ref([]);
 const mdStr = ref("");
 const upload = ref(null);
 
-// 计算属性
 const supportFileStr = computed(() => {
   return ".smm,.json,.xmind,.md";
 });
 
-// 监听器
 watch(dialogVisible, (val, oldVal) => {
   if (!val && oldVal) {
     fileList.value = [];
   }
 });
 
-// 生命周期钩子
 onMounted(() => {
   emitter.on("showImport", handleShowImport);
   emitter.on("handle_file_url", handleFileURL);
@@ -126,21 +110,17 @@ onBeforeUnmount(() => {
   emitter.off("importFile", handleImportFile);
 });
 
-// 方法
-const getRegexp = () => {
-  return new RegExp(`\.(smm|json|xmind|md)$`);
-};
+/** 支持文件格式的正则 */
+const getRegexp = () => new RegExp(`\.(smm|json|xmind|md)$`);
 
-// 检查url中是否操作需要打开的文件
+/** 检查url中文件格式是否支持，并操作对应的文件 */
 const handleFileURL = async () => {
   try {
     const fileURL = router.currentRoute.value.query.fileURL;
     if (!fileURL) return;
-    const macth = getRegexp().exec(fileURL);
-    if (!macth) {
-      return;
-    }
-    const type = macth[1];
+    const match = getRegexp().exec(fileURL);
+    if (!match) return;
+    const type = match[1];
     const res = await fetch(fileURL);
     const file = await res.blob();
     const data = {
@@ -154,25 +134,32 @@ const handleFileURL = async () => {
       handleMd(data);
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 
-// 文件选择
-const onChange = (file) => {
-  if (!getRegexp().test(file.name)) {
+/** 已上传文件列表发生变化时触发 */
+const onChange = (files) => {
+  console.log("onChange", files);
+  if (files.length === 0) return;
+  if (!getRegexp().test(files[0].name)) {
     MessagePlugin.error(
       t("import.pleaseSelect") + supportFileStr.value + t("import.file")
     );
     fileList.value = [];
   } else {
-    fileList.value.push(file);
+    // 将原始文件对象转换为TDesign UploadFile格式
+    // const uploadFile = {
+    //   name: file[0].name,
+    //   lastModified: file[0].lastModified,
+    //   size: file[0].size,
+    //   type: file[0].type,
+    //   percent: 0,
+    //   status: "waiting",
+    //   raw: file[0].raw,
+    // };
+    fileList.value.push(files[0]);
   }
-};
-
-// 移除文件
-const onRemove = (file, files) => {
-  fileList.value = files;
 };
 
 // 数量超出限制
@@ -180,18 +167,13 @@ const onExceed = () => {
   MessagePlugin.error(t("import.maxFileNum"));
 };
 
-// 取消
-const cancel = () => {
-  dialogVisible.value = false;
-};
-
-// 确定
+const cancel = () => (dialogVisible.value = false);
 const confirm = () => {
   if (fileList.value.length <= 0) {
     return MessagePlugin.error(t("import.notSelectTip"));
   }
   appStore.setIsHandleLocalFile(false);
-  let file = fileList.value[0];
+  const file = fileList.value[0];
   if (/\.(smm|json)$/.test(file.name)) {
     handleSmm(file);
   } else if (/\.xmind$/.test(file.name)) {
@@ -199,33 +181,33 @@ const confirm = () => {
   } else if (/\.md$/.test(file.name)) {
     handleMd(file);
   }
-  cancel();
+  // cancel();
   appStore.setActiveSidebar(null);
 };
 
-// 处理.smm文件
+/** 处理.smm文件 */
 const handleSmm = (file) => {
-  let fileReader = new FileReader();
+  const fileReader = new FileReader();
   fileReader.readAsText(file.raw);
   fileReader.onload = (evt) => {
     try {
-      let data = JSON.parse(evt.target.result);
+      const data = JSON.parse(evt.target.result);
       if (typeof data !== "object") {
         throw new Error(t("import.fileContentError"));
       }
       emitter.emit("setData", data);
       MessagePlugin.success(t("import.importSuccess"));
     } catch (error) {
-      console.log(error);
+      console.error(error);
       MessagePlugin.error(t("import.fileParsingFailed"));
     }
   };
 };
 
-// 处理.xmind文件
+/** 处理.xmind文件 */
 const handleXmind = async (file) => {
   try {
-    let data = await xmind.parseXmindFile(file.raw, (content) => {
+    const data = await xmind.parseXmindFile(file.raw, (content) => {
       showSelectXmindCanvasDialog(content);
       return new Promise((resolve) => {
         selectPromiseResolve.value = resolve;
@@ -234,11 +216,26 @@ const handleXmind = async (file) => {
     emitter.emit("setData", data);
     MessagePlugin.success(t("import.importSuccess"));
   } catch (error) {
-    console.log(error);
+    console.error(error);
     MessagePlugin.error(t("import.fileParsingFailed"));
   }
 };
 
+/** 处理markdown文件 */
+const handleMd = (file) => {
+  let fileReader = new FileReader();
+  fileReader.readAsText(file.raw);
+  fileReader.onload = async (evt) => {
+    try {
+      let data = markdown.transformMarkdownTo(evt.target.result);
+      emitter.emit("setData", data);
+      MessagePlugin.success(t("import.importSuccess"));
+    } catch (error) {
+      console.error(error);
+      MessagePlugin.error(t("import.fileParsingFailed"));
+    }
+  };
+};
 // 显示xmind文件的多个画布选择弹窗
 const showSelectXmindCanvasDialog = (content) => {
   canvasList.value = content;
@@ -254,28 +251,10 @@ const confirmSelect = () => {
   selectCanvas.value = 0;
 };
 
-// 处理markdown文件
-const handleMd = (file) => {
-  let fileReader = new FileReader();
-  fileReader.readAsText(file.raw);
-  fileReader.onload = async (evt) => {
-    try {
-      let data = markdown.transformMarkdownTo(evt.target.result);
-      emitter.emit("setData", data);
-      MessagePlugin.success(t("import.importSuccess"));
-    } catch (error) {
-      console.log(error);
-      MessagePlugin.error(t("import.fileParsingFailed"));
-    }
-  };
-};
+/** 显示导入对话框 */
+const handleShowImport = () => (dialogVisible.value = true);
 
-// 显示导入对话框
-const handleShowImport = () => {
-  dialogVisible.value = true;
-};
-
-// 导入指定文件
+/** 拖拽导入文件事件处理 */
 const handleImportFile = (file) => {
   onChange({
     raw: file,
