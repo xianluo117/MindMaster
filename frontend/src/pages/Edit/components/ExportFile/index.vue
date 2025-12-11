@@ -3,6 +3,7 @@
     v-model:visible="dialogVisible"
     :title="$t('export.title')"
     width="800px"
+    placement="center"
     :confirmLoading="loading"
     :closeBtn="false"
     :header="false"
@@ -37,12 +38,7 @@
           <div class="nameInputBox">
             <div class="nameInput">
               <span class="name">{{ $t("export.filename") }}</span>
-              <t-input
-                style="max-width: 250px"
-                v-model="fileName"
-                size="small"
-                @keydown.stop
-              ></t-input>
+              <t-input v-model="fileName" />
             </div>
             <span
               class="closeBtn el-icon-close"
@@ -79,9 +75,9 @@
                   class="valueItem"
                   v-show="['smm', 'json'].includes(exportType)"
                 >
-                  <t-checkbox v-model="widthConfig">{{
-                    $t("export.include")
-                  }}</t-checkbox>
+                  <t-checkbox v-model="widthConfig">
+                    {{ $t("export.include") }}
+                  </t-checkbox>
                 </div>
                 <div
                   class="valueItem"
@@ -92,18 +88,14 @@
                     v-if="['png'].includes(exportType)"
                   >
                     <span class="name">{{ $t("export.format") }}</span>
-                    <t-radio-group v-model="imageFormat">
-                      <t-radio label="png">PNG</t-radio>
-                    </t-radio-group>
+                    <t-radio :checked="true">{{ imageFormat }}</t-radio>
                   </div>
                   <div class="valueSubItem">
                     <span class="name">{{ $t("export.paddingX") }}</span>
                     <t-input
                       style="width: 200px"
                       v-model="paddingX"
-                      size="small"
                       @change="onPaddingChange"
-                      @keydown.stop
                     ></t-input>
                   </div>
                   <div class="valueSubItem">
@@ -111,9 +103,7 @@
                     <t-input
                       style="width: 200px"
                       v-model="paddingY"
-                      size="small"
                       @change="onPaddingChange"
-                      @keydown.stop
                     ></t-input>
                   </div>
                   <div class="valueSubItem">
@@ -121,24 +111,24 @@
                     <t-input
                       style="width: 200px"
                       v-model="extraText"
-                      size="small"
                       :placeholder="$t('export.addFooterTextPlaceholder')"
-                      @keydown.stop
                     ></t-input>
                   </div>
                   <div class="valueSubItem">
                     <t-checkbox
                       v-show="['png', 'pdf'].includes(exportType)"
                       v-model="isTransparent"
-                      >{{ $t("export.isTransparent") }}</t-checkbox
                     >
+                      {{ $t("export.isTransparent") }}
+                    </t-checkbox>
                   </div>
                   <div class="valueSubItem">
                     <t-checkbox
                       v-show="showFitBgOption"
                       v-model="isFitBg"
-                      >{{ $t("export.isFitBg") }}</t-checkbox
                     >
+                      {{ $t("export.isFitBg") }}
+                    </t-checkbox>
                   </div>
                 </div>
               </div>
@@ -149,13 +139,15 @@
             <t-button
               variant="outline"
               @click="cancel"
-              >{{ $t("dialog.cancel") }}</t-button
             >
+              {{ $t("dialog.cancel") }}
+            </t-button>
             <t-button
               type="primary"
               @click="confirm"
-              >{{ $t("export.confirm") }}</t-button
             >
+              {{ $t("export.confirm") }}
+            </t-button>
           </div>
         </div>
       </div>
@@ -169,10 +161,9 @@ import appStore from "@/stores";
 import emitter from "@/utils/eventBus";
 import { computed, ref } from "vue";
 
-// 数据定义
 const dialogVisible = ref(false);
-const exportType = ref("smm");
-const fileName = ref("思维导图");
+const exportType = ref("png");
+const fileName = ref("思维导图大师");
 const widthConfig = ref(true);
 const isTransparent = ref(false);
 const loading = ref(false);
@@ -184,7 +175,6 @@ const isMobile = ref(false);
 const isFitBg = ref(true);
 const imageFormat = ref("png");
 
-// 计算属性
 const currentTypeData = computed(() => {
   return downTypeList.find((item) => item.type === exportType.value);
 });
@@ -209,6 +199,7 @@ const cancel = () => {
   dialogVisible.value = false;
 };
 
+/** 导出 */
 const confirm = () => {
   appStore.setExtraTextOnExport(extraText.value);
 
@@ -263,11 +254,18 @@ const confirm = () => {
   cancel();
 };
 
-// 监听事件
 emitter.on("showExport", () => {
   dialogVisible.value = true;
 });
 </script>
+
+<style lang="less">
+.t-dialog {
+  .t-dialog__body {
+    padding: 0 !important;
+  }
+}
+</style>
 
 <style lang="less" scoped>
 .exportContainer {
@@ -288,7 +286,7 @@ emitter.on("showExport", () => {
       height: 100%;
       overflow-y: auto;
       overflow-x: hidden;
-      background-color: #f2f4f7;
+      background-color: var(--td-gray-color-3);
       flex-shrink: 0;
       padding: 16px 0;
 
@@ -402,16 +400,16 @@ emitter.on("showExport", () => {
 
         .nameInput {
           display: flex;
-          flex-wrap: wrap;
+          flex-wrap: nowrap;
           align-items: center;
           width: 100%;
           font-weight: bold;
-
           .name {
             margin-right: 10px;
             font-size: 15px;
-            color: #333;
+            color: #000;
             font-weight: bold;
+            white-space: nowrap; /* 防止文字换行，确保宽度随内容自适应 */
           }
         }
 
@@ -438,18 +436,17 @@ emitter.on("showExport", () => {
 
           .contentName {
             min-width: 40px;
-            color: #808080;
+            color: #000;
             flex-shrink: 0;
-            font-size: 13px;
-            font-weight: 500;
+            font-size: 15px;
+            font-weight: bold;
             line-height: 25px;
             margin-right: 12px;
           }
 
           .contentValue {
-            color: #808080;
+            color: #000;
             line-height: 23px;
-            font-weight: 500;
             border: 1px solid transparent;
             font-size: 14px;
 

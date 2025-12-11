@@ -1,9 +1,23 @@
 <template>
-  <t-tooltip :content="tip" placement="bottom">
-    <t-button :class="{ active: !isDisabled && isActive }" shape="square" variant="text" size="small"
-      :disabled="isDisabled" @click="handleClick">
+  <t-tooltip
+    :content="tip"
+    placement="bottom"
+  >
+    <t-button
+      :class="{ active: !isDisabled && isActive }"
+      shape="square"
+      variant="text"
+      size="small"
+      :disabled="isDisabled"
+      @click="handleClick"
+    >
       <div class="btn-content">
-        <component :is="icon" size="20px" :stroke-width="1.5" :stroke-color="myColor" />
+        <component
+          :is="icon"
+          size="20px"
+          :stroke-width="1.5"
+          :stroke-color="myColor"
+        />
         <span :style="{ color: myColor }">{{ label }}</span>
       </div>
     </t-button>
@@ -11,7 +25,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed } from "vue";
 
 const { isDisabled, label } = defineProps({
   tip: {
@@ -44,19 +58,19 @@ const { isDisabled, label } = defineProps({
     type: Function,
     required: true,
   },
-})
+});
 
 const myColor = computed(() => {
   // 如果禁用，使用默认颜色
   if (isDisabled) {
-    return '';
+    return "";
   }
   // 如果是AI图标且未禁用，使用红色
-  if (label === 'AI') {
-    return '#FF4D4F';
+  if (label === "AI") {
+    return "#FF4D4F";
   }
   // 其他情况使用黑色
-  return '#000';
+  return "#000";
 });
 </script>
 
@@ -73,13 +87,13 @@ const myColor = computed(() => {
 
   // 非禁用时的hover效果
   &:hover:not(.t-is-disabled) {
-    background-color: #d0d0d0;
+    background-color: var(--td-gray-color-3);
     // border-color: #e0e0e0;
   }
 
   &.active {
-    background-color: #d0d0d0;
-    border-color: #d0d0d0;
+    background-color: var(--td-gray-color-3);
+    border-color: var(--td-gray-color-3);
   }
 
   .btn-content {

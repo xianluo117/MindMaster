@@ -24,12 +24,6 @@ export const appConfig = {
 // 下载类型列表
 export const downTypeList = [
   {
-    name: "思绪文件",
-    type: "smm",
-    icon: "iconwenjian",
-    desc: "SimpleMindMap私有格式，可用于再次导入，客户端可直接编辑",
-  },
-  {
     name: "图片",
     type: "png",
     icon: "iconPNG",
@@ -65,12 +59,12 @@ export const downTypeList = [
     icon: "iconTXT",
     desc: "纯文本文件",
   },
-  {
-    name: "Excel",
-    type: "xlsx",
-    icon: "iconfile-excel",
-    desc: "表格文本形式，可用Excel软件编辑",
-  },
+  // {
+  //   name: "Excel",
+  //   type: "xlsx",
+  //   icon: "iconfile-excel",
+  //   desc: "表格文本形式，可用Excel软件编辑",
+  // },
   {
     name: "FreeMind",
     type: "mm",
