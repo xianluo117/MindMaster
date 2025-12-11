@@ -174,14 +174,14 @@ export default function useToolbar() {
     //   label: "注释",
     //   handler: () => onSetAnnotation,
     // },
-    {
-      name: "ai",
-      icon: LogoAdobeIllustrateIcon,
-      label: "AI",
-      disabled: hasGeneralization.value,
-      //TODO ai功能待实现
-      handler: () => {},
-    },
+    // {
+    //   name: "ai",
+    //   icon: LogoAdobeIllustrateIcon,
+    //   label: "AI",
+    //   disabled: hasGeneralization.value,
+    //   //TODO ai功能待实现
+    //   handler: () => {},
+    // },
   ]);
 
   /** 右侧按钮列表 */

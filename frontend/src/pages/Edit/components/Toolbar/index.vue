@@ -15,6 +15,7 @@
     </div>
     <!-- 工具相关子组件 -->
     <ImportFile />
+    <ExportFile />
   </div>
 </template>
 
@@ -32,6 +33,7 @@ import ToolBase from './ToolBase.vue'
 import useToolbar from './useToolbar.js'
 
 import ImportFile from '../ImportFile/index.vue'
+import ExportFile from '../ExportFile/index.vue'
 
 const toolbarRef = ref(null)
 

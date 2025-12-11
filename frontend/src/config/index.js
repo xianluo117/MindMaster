@@ -6,17 +6,81 @@ export const appConfig = {
   appNameCn: import.meta.env.VITE_APP_NAME_CN,
   appNameEn: import.meta.env.VITE_APP_NAME_EN,
   appVer: import.meta.env.VITE_APP_VERSION,
-  
+
   // 作者和部门信息
   author: import.meta.env.VITE_AUTHOR,
   department: import.meta.env.VITE_DEPARTMENT,
-  
+
   // 可以在这里添加更多全局配置项
-  baseUrl: import.meta.env.VITE_BASE_URL || '/',
-  
+  baseUrl: import.meta.env.VITE_BASE_URL || "/",
+
   // API相关配置
   api: {
     timeout: 10000,
-    retryCount: 3
-  }
-}
+    retryCount: 3,
+  },
+};
+
+// 下载类型列表
+export const downTypeList = [
+  {
+    name: "思绪文件",
+    type: "smm",
+    icon: "iconwenjian",
+    desc: "SimpleMindMap私有格式，可用于再次导入，客户端可直接编辑",
+  },
+  {
+    name: "图片",
+    type: "png",
+    icon: "iconPNG",
+    desc: "常用图片格式，适合查看分享",
+  },
+  {
+    name: "SVG",
+    type: "svg",
+    icon: "iconSVG",
+    desc: "可缩放矢量图形",
+  },
+  {
+    name: "PDF",
+    type: "pdf",
+    icon: "iconpdf",
+    desc: "适合查看浏览和打印",
+  },
+  {
+    name: "Markdown",
+    type: "md",
+    icon: "iconmarkdown",
+    desc: "md文本格式，便于其他软件打开",
+  },
+  {
+    name: "XMind",
+    type: "xmind",
+    icon: "iconxmind",
+    desc: "XMind软件格式",
+  },
+  {
+    name: "Txt",
+    type: "txt",
+    icon: "iconTXT",
+    desc: "纯文本文件",
+  },
+  {
+    name: "Excel",
+    type: "xlsx",
+    icon: "iconfile-excel",
+    desc: "表格文本形式，可用Excel软件编辑",
+  },
+  {
+    name: "FreeMind",
+    type: "mm",
+    icon: "iconfreemind",
+    desc: "FreeMind软件格式",
+  },
+  {
+    name: "JSON",
+    type: "json",
+    icon: "iconjson",
+    desc: "流行的数据交换格式，可用于再次导入",
+  },
+];

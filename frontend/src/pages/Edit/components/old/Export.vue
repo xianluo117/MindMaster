@@ -506,43 +506,43 @@ export default {
             background-size: cover;
 
             &.png {
-              background-image: url('../../../assets/img/foramt/2.png');
+              background-image: url('@/assets/img/format/2.png');
             }
 
             &.pdf {
-              background-image: url('../../../assets/img/foramt/4.png');
+              background-image: url('@/assets/img/format/4.png');
             }
 
             &.md {
-              background-image: url('../../../assets/img/foramt/5.png');
+              background-image: url('@/assets/img/format/5.png');
             }
 
             &.json {
-              background-image: url('../../../assets/img/foramt/10.png');
+              background-image: url('@/assets/img/format/10.png');
             }
 
             &.svg {
-              background-image: url('../../../assets/img/foramt/3.png');
+              background-image: url('@/assets/img/format/3.png');
             }
 
             &.smm {
-              background-image: url('../../../assets/img/foramt/1.png');
+              background-image: url('@/assets/img/format/1.png');
             }
 
             &.xmind {
-              background-image: url('../../../assets/img/foramt/6.png');
+              background-image: url('@/assets/img/format/6.png');
             }
 
             &.txt {
-              background-image: url('../../../assets/img/foramt/7.png');
+              background-image: url('@/assets/img/format/7.png');
             }
 
             &.mm {
-              background-image: url('../../../assets/img/foramt/8.png');
+              background-image: url('@/assets/img/format/8.png');
             }
 
             &.xlsx {
-              background-image: url('../../../assets/img/foramt/9.png');
+              background-image: url('@/assets/img/format/9.png');
             }
           }
 
