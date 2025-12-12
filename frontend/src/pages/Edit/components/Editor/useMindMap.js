@@ -1,14 +1,13 @@
-// composables/useMindMap.js
 import { getConfig, getData, storeData } from "@/api";
 import imgLoadFailSvg from "@/assets/img/imgLoadFailed.svg";
+import exampleData from "@/config/exampleData";
 import icon from "@/config/icon";
 import appStore from "@/stores";
 import emitter from "@/utils/eventBus";
 import handleClipboardText from "@/utils/handleClipboardText";
 import MindMap from "simple-mind-map";
-import exampleData from "simple-mind-map/example/exampleData";
-import { ref } from "vue";
 import { DialogPlugin, MessagePlugin } from "tdesign-vue-next";
+import { ref } from "vue";
 import { useRoute } from "vue-router";
 
 // 注册插件

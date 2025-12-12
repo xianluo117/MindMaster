@@ -165,7 +165,7 @@ export default {
     paddingX: '水平内边距',
     paddingY: '垂直内边距',
     useMultiPageExport: '是否多页导出',
-    defaultFileName: '思维导图',
+    defaultFileName: '思维导图大师',
     addFooterText: '底部水印文字',
     addFooterTextPlaceholder: '比如：来自MindMaster思维导图大师',
     desc: '说明',

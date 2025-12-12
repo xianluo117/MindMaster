@@ -6,47 +6,15 @@
         <div class="infoDesc">
           版本号{{ appConfig.appVer }} © {{ appConfig.department }} | {{ appConfig.author }}
         </div>
-        <!-- <div class="linkBtnList">
-          <div class="linkBtn">
-            <a href="https://github.com/wanglin2" target="_blank">
-              <span class="linkBtnIcon iconfont icongithub"></span>
-            </a>
-          </div>
-          <div class="linkBtn">
-            <a href="https://juejin.cn/user/325111170756279" target="_blank">
-              <span class="linkBtnIcon text">掘金</span>
-            </a>
-          </div>
-          <div class="linkBtn">
-            <a href="https://segmentfault.com/u/jiejiaoxiaolin/articles" target="_blank">
-              <span class="linkBtnIcon text">思否</span>
-            </a>
-          </div>
-          <div class="linkBtn">
-            <a href="http://lxqnsys.com/" target="_blank">
-              <span class="linkBtnIcon iconfont iconwangzhan"></span>
-            </a>
-          </div>
-          <div class="linkBtn">
-            <a href="https://www.zhihu.com/people/wang-lin-49-43-65" target="_blank">
-              <span class="linkBtnIcon iconfont iconshejiaotubiao-10"></span>
-            </a>
-          </div>
-          <div class="linkBtn">
-            <a href="https://blog.csdn.net/sinat_33488770?type=blog" target="_blank">
-              <span class="linkBtnIcon iconfont iconcsdn"></span>
-            </a>
-          </div>
-        </div> -->
       </div>
-      <div class="linkBox">
+      <!-- <div class="linkBox">
         <div class="linkTitle">更多作品</div>
         <div class="linkList">
           <div class="linkItem" v-for="item in linkList" :key="item.name">
             <a :href="item.url" target="_blank">{{ item.name }}</a>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>

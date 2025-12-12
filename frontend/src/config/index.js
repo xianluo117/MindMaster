@@ -33,7 +33,7 @@ export const downTypeList = [
     name: "SVG",
     type: "svg",
     icon: "iconSVG",
-    desc: "可缩放矢量图形",
+    desc: "怎么放大都很清晰，要用浏览器打开",
   },
   {
     name: "PDF",
@@ -45,7 +45,7 @@ export const downTypeList = [
     name: "Markdown",
     type: "md",
     icon: "iconmarkdown",
-    desc: "md文本格式，便于其他软件打开",
+    desc: "最流行的笔记格式，用纯文字加标识符定义不同格式文本",
   },
   {
     name: "XMind",
@@ -65,12 +65,12 @@ export const downTypeList = [
   //   icon: "iconfile-excel",
   //   desc: "表格文本形式，可用Excel软件编辑",
   // },
-  {
-    name: "FreeMind",
-    type: "mm",
-    icon: "iconfreemind",
-    desc: "FreeMind软件格式",
-  },
+  // {
+  //   name: "FreeMind",
+  //   type: "mm",
+  //   icon: "iconfreemind",
+  //   desc: "FreeMind软件格式",
+  // },
   {
     name: "JSON",
     type: "json",

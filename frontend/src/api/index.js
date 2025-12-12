@@ -1,36 +1,36 @@
-import exampleData from 'simple-mind-map/example/exampleData'
-import { simpleDeepClone } from 'simple-mind-map/src/utils/index'
-import emitter from '@/utils/eventBus.js'
-import { useLocalStorage } from '@vueuse/core'
+import exampleData from "@/config/exampleData";
+import { simpleDeepClone } from "simple-mind-map/src/utils/index";
+import emitter from "@/utils/eventBus.js";
+import { useLocalStorage } from "@vueuse/core";
 // import { useAppStore } from '@/stores'
 
-const MINDMASTER_DATA = 'MINDMASTER_DATA'
-const MINDMASTER_CONFIG = 'MINDMASTER_CONFIG'
+const MINDMASTER_DATA = "MINDMASTER_DATA";
+const MINDMASTER_CONFIG = "MINDMASTER_CONFIG";
 // const MINDMASTER_LANG = 'MINDMASTER_LANG'
-const MINDMASTER_LOCAL_CONFIG = 'MINDMASTER_LOCAL_CONFIG'
+const MINDMASTER_LOCAL_CONFIG = "MINDMASTER_LOCAL_CONFIG";
 
 // 使用VueUse的useLocalStorage
-const dataStorage = useLocalStorage(MINDMASTER_DATA, null)
+const dataStorage = useLocalStorage(MINDMASTER_DATA, null);
 // const langStorage = useLocalStorage(MINDMASTER_LANG, 'zh')
-const localConfigStorage = useLocalStorage(MINDMASTER_LOCAL_CONFIG, null)
-const configStorage = useLocalStorage(MINDMASTER_CONFIG, null)
+const localConfigStorage = useLocalStorage(MINDMASTER_LOCAL_CONFIG, null);
+const configStorage = useLocalStorage(MINDMASTER_CONFIG, null);
 
 /**
  * @description: 获取缓存的思维导图数据
  * @return {*}
  */
 export const getData = () => {
-  let store = dataStorage.value
+  let store = dataStorage.value;
   if (store === null) {
-    return simpleDeepClone(exampleData)
+    return simpleDeepClone(exampleData);
   } else {
     try {
-      return JSON.parse(store)
+      return JSON.parse(store);
     } catch (error) {
-      return simpleDeepClone(exampleData)
+      return simpleDeepClone(exampleData);
     }
   }
-}
+};
 
 /**
  * @description: 存储思维导图数据
@@ -39,35 +39,35 @@ export const getData = () => {
  */
 export const storeData = (data) => {
   try {
-    let originData = getData()
+    let originData = getData();
     if (!originData) {
-      originData = {}
+      originData = {};
     }
     originData = {
       ...originData,
       ...data,
-    }
-    emitter.emit('write_local_file', originData)
-    dataStorage.value = JSON.stringify(originData)
+    };
+    emitter.emit("write_local_file", originData);
+    dataStorage.value = JSON.stringify(originData);
   } catch (error) {
-    console.error(error)
-    if ('exceeded') {
-      emitter.emit('localStorageExceeded')
+    console.error(error);
+    if ("exceeded") {
+      emitter.emit("localStorageExceeded");
     }
   }
-}
+};
 
 /**
  * @description: 获取缓存的思维导图配置数据
  * @return {*}
  */
 export const getConfig = () => {
-  const config = configStorage.value
+  const config = configStorage.value;
   if (config) {
-    return JSON.parse(config)
+    return JSON.parse(config);
   }
-  return null
-}
+  return null;
+};
 
 /**
  * @description: 存储思维导图配置数据
@@ -76,11 +76,11 @@ export const getConfig = () => {
  */
 export const storeConfig = (config) => {
   try {
-    configStorage.value = JSON.stringify(config)
+    configStorage.value = JSON.stringify(config);
   } catch (error) {
-    console.error(error)
+    console.error(error);
   }
-}
+};
 
 // 存储语言
 // export const storeLang = lang => {
@@ -110,17 +110,17 @@ export const storeConfig = (config) => {
  * @return {*}
  */
 export const storeLocalConfig = (config) => {
-  localConfigStorage.value = JSON.stringify(config)
-}
+  localConfigStorage.value = JSON.stringify(config);
+};
 
 /**
  * @description: 获取本地配置
  * @return {*}
  */
 export const getLocalConfig = () => {
-  const config = localConfigStorage.value
+  const config = localConfigStorage.value;
   if (config) {
-    return JSON.parse(config)
+    return JSON.parse(config);
   }
-  return null
-}
+  return null;
+};

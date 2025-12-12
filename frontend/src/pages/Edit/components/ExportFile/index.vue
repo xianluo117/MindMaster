@@ -131,8 +131,10 @@
 
 <script setup>
   import { downTypeList } from "@/config";
+  import { t } from "@/locales";
   import appStore from "@/stores";
   import emitter from "@/utils/eventBus";
+  import { NotifyPlugin } from "tdesign-vue-next";
   import { computed, ref } from "vue";
 
   const dialogVisible = ref(false);
@@ -221,9 +223,9 @@
       emitter.emit("export", exportType.value, true, fileName.value);
     }
 
-    emitter.emit("notify", {
-      title: "导出成功",
-      message: "文件已保存到本地",
+    NotifyPlugin.info({
+      title: t("export.notifyTitle"),
+      content: t("export.notifyMessage"),
     });
 
     cancel();

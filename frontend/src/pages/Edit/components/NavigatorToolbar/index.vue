@@ -9,7 +9,7 @@
         :handleClick="handleIconClick"
       />
     </div>
-    <!-- 回到根节点 -->
+    <!-- 缩放至适应画布 -->
     <div class="item">
       <IconBtn
         name="fitToCanvas"

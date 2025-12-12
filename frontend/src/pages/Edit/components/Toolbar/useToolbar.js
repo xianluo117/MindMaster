@@ -2,6 +2,7 @@ import appStore from "@/stores";
 import emitter from "@/utils/eventBus.js";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import {
+  HomeIcon,
   RollbackIcon,
   RollfrontIcon,
   BrushIcon,
@@ -27,12 +28,15 @@ import {
 import { getData } from "@/api";
 import { LoadingPlugin } from "tdesign-vue-next";
 import { t } from "@/locales";
+import exampleData from "@/config/exampleData";
+import { useRouter } from "vue-router";
 
 /**
  * 工具栏相关信息hooks
  * 封装工具栏按钮的状态管理、事件处理和禁用条件逻辑
  */
 export default function useToolbar() {
+  const router = useRouter();
   const activeNodes = ref([]);
   const backEnd = ref(true);
   const forwardEnd = ref(true);
@@ -49,6 +53,12 @@ export default function useToolbar() {
 
   /** 左侧按钮列表 */
   const leftBtnList = computed(() => [
+    {
+      name: "index",
+      icon: HomeIcon,
+      label: "首页",
+      handler: () => router.replace("/"),
+    },
     {
       name: "back",
       icon: RollbackIcon,

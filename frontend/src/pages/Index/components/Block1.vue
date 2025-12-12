@@ -16,7 +16,7 @@
           <t-button
             size="large"
             variant="text"
-            href="/edit"
+            href="/mind-master"
             style="color: #fff; background-color: #ff4d4f"
           >
             开始使用

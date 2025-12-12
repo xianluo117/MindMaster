@@ -24,7 +24,7 @@
 import { getData } from '@/api'
 import appStore from '@/stores'
 import emitter from '@/utils/eventBus.js'
-import exampleData from 'simple-mind-map/example/exampleData'
+import exampleData from "@/config/exampleData"
 import { isMobile as isMobileUtil, throttle } from 'simple-mind-map/src/utils/index'
 import { LoadingPlugin, MessagePlugin, NotifyPlugin } from 'tdesign-vue-next'
 import { computed, onBeforeUnmount, onMounted, ref, watch, nextTick } from 'vue'
