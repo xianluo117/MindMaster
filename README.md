@@ -1,6 +1,6 @@
 # MindMaster | 思维导图大师
 
-一个基于 Vue3 + FastAPI 的现代化在线思维导图应用，支持实时保存、导出多种格式和节点级的操作等，图谱支持逻辑结构图（向左、向右逻辑结构图）、思维导图、组织结构图、目录组织图、时间轴（横向、竖向）、鱼骨图等结构。
+一个基于 Vue3 + FastAPI 的现代化在线思维导图应用，支持实时保存（全部在浏览器本地更安全）、导出多种格式和节点级的操作等，图谱支持逻辑结构图（向左、向右逻辑结构图）、思维导图、组织结构图、目录组织图、时间轴（横向、竖向）、鱼骨图等结构。
 
 ## ⚠️ 开源声明
 
@@ -16,6 +16,12 @@
 - **UI 组件库**：[TDesign Web Vue Next](https://tdesign.tencent.com/vue-next/components/overview)
 - **思维导图核心库**：[wanglin2/mind-map](https://github.com/wanglin2/mind-map)
 - **后端框架**：Python 3.11+，FastAPI
+
+## 😄 静态界面展示
+
+![index1](assets/index1.jpg)
+![index2](assets/index2.jpg)
+![edit](assets/edit.jpg)
 
 ## 📦 快速开始
 
