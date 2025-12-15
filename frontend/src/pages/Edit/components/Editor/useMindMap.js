@@ -2,7 +2,7 @@ import { getConfig, getData, storeData } from "@/api";
 import imgLoadFailSvg from "@/assets/img/imgLoadFailed.svg";
 import exampleData from "@/config/exampleData";
 import icon from "@/config/icon";
-import appStore from "@/stores";
+import { useAppStore } from "@/stores";
 import emitter from "@/utils/eventBus";
 import handleClipboardText from "@/utils/handleClipboardText";
 import MindMap from "simple-mind-map";
@@ -62,6 +62,7 @@ Themes.init(MindMap);
  * @returns
  */
 export default function useMindMap(mindMapRef) {
+  const appStore = useAppStore();
   const route = useRoute();
   const mindMap = ref(null);
   const mindMapData = ref(null);

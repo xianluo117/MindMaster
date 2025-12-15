@@ -1,4 +1,4 @@
-import appStore from "@/stores";
+import { useAppStore } from "@/stores";
 import emitter from "@/utils/eventBus.js";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import {
@@ -36,6 +36,7 @@ import { useRouter } from "vue-router";
  * 封装工具栏按钮的状态管理、事件处理和禁用条件逻辑
  */
 export default function useToolbar() {
+  const appStore = useAppStore();
   const router = useRouter();
   const activeNodes = ref([]);
   const backEnd = ref(true);

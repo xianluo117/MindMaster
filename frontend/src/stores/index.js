@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { storeLocalConfig } from '@/api'
 
-const useAppStore = defineStore('app', {
+export const useAppStore = defineStore('app', {
   state: () => ({
     /**
      * @property {boolean} isHandleLocalFile - 是否操作的是本地文件
@@ -176,5 +176,5 @@ const useAppStore = defineStore('app', {
   },
 })
 
-const appStore = useAppStore()
-export default appStore
+// const appStore = useAppStore()
+// export default appStore

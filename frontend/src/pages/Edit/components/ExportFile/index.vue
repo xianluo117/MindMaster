@@ -132,10 +132,12 @@
 <script setup>
   import { downTypeList } from "@/config";
   import { t } from "@/locales";
-  import appStore from "@/stores";
+  import { useAppStore } from "@/stores";
   import emitter from "@/utils/eventBus";
   import { NotifyPlugin } from "tdesign-vue-next";
   import { computed, ref } from "vue";
+
+  const appStore = useAppStore();
 
   const dialogVisible = ref(false);
   const exportType = ref("png");

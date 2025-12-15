@@ -8,28 +8,29 @@
 </template>
 
 <script setup>
-import Toolbar from './components/Toolbar/index.vue'
-import Editor from './components/Editor/index.vue'
-import appStore from '@/stores'
-import { ref, onMounted } from 'vue'
-import { getLocalConfig } from '@/api'
-import { showLoading, hideLoading } from '@/utils/loading'
+  import Toolbar from "./components/Toolbar/index.vue";
+  import Editor from "./components/Editor/index.vue";
+  import { useAppStore } from "@/stores";
+  import { ref, onMounted } from "vue";
+  import { getLocalConfig } from "@/api";
+  import { showLoading, hideLoading } from "@/utils/loading";
 
-const show = ref(false)
-const initLocalConfig = () => {
-  let config = getLocalConfig()
-  if (config) {
-    appStore.setLocalConfig({
-      ...appStore.localConfig,
-      ...config
-    })
-  }
-}
+  const appStore = useAppStore();
+  const show = ref(false);
+  const initLocalConfig = () => {
+    let config = getLocalConfig();
+    if (config) {
+      appStore.setLocalConfig({
+        ...appStore.localConfig,
+        ...config,
+      });
+    }
+  };
 
-onMounted(async () => {
-  initLocalConfig()
-  showLoading()
-  show.value = true
-  hideLoading()
-})
+  onMounted(async () => {
+    initLocalConfig();
+    showLoading();
+    show.value = true;
+    hideLoading();
+  });
 </script>

@@ -1,5 +1,5 @@
 import { t } from "@/locales";
-import appStore from "@/stores";
+import { useAppStore } from "@/stores";
 import emitter from "@/utils/eventBus";
 import { hideLoading, showLoading } from "@/utils/loading";
 import { NotifyPlugin } from "tdesign-vue-next";
@@ -12,6 +12,7 @@ import { ref } from "vue";
  * @returns
  */
 export default function useEventHandlers(mindMap, manualSave) {
+  const appStore = useAppStore();
   const enableShowLoading = ref(true);
   /** 执行命令，每执行一个命令就会在历史堆栈里添加一条记录用于回退或前进 */
   const execCommand = (...args) => {

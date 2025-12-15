@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
-import IndexView from "@/pages/Index/index.vue";
+import IndexPage from "@/pages/Index/index.vue";
+import EditPage from "@/pages/Edit/index.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -7,12 +8,12 @@ const router = createRouter({
     {
       path: "/",
       name: "Index",
-      component: IndexView,
+      component: IndexPage,
     },
     {
       path: "/mind-master",
       name: "MindMaster",
-      component: () => import("@/pages/Edit/index.vue"),
+      component: EditPage,
     },
   ],
 });
