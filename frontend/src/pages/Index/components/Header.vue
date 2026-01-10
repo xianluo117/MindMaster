@@ -24,7 +24,10 @@
           >
             登录/注册
           </t-button>
-          <t-button v-else variant="text" @click="handleLogout">退出</t-button>
+          <template v-else>
+            <t-button variant="text" @click="goAccount">账户设置</t-button>
+            <t-button variant="text" @click="handleLogout">退出</t-button>
+          </template>
         </div>
       </template>
     </t-head-menu>
@@ -51,6 +54,7 @@ const displayName = computed(() => authStore.username || "未登录用户");
 const onScroll = () => (isScrolled.value = window.scrollY > 0);
 const openAuthDialog = () => emitter.emit("open_auth_dialog");
 const handleLogout = () => authStore.logout();
+const goAccount = () => emitter.emit("go_account");
 
 onMounted(() => window.addEventListener("scroll", onScroll));
 onUnmounted(() => window.removeEventListener("scroll", onScroll));

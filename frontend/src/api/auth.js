@@ -13,3 +13,9 @@ export const loginUser = (payload) =>
   });
 
 export const fetchMe = () => request("/api/auth/me");
+
+export const resetPassword = (payload) =>
+  request("/api/auth/reset-password", {
+    method: "POST",
+    body: payload,
+  });

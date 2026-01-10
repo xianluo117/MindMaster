@@ -85,6 +85,11 @@ class PasswordResetRequest(BaseModel):
     password: str = Field(..., min_length=6, max_length=128)
 
 
+class PasswordChangeRequest(BaseModel):
+    current_password: str = Field(..., min_length=6, max_length=128)
+    new_password: str = Field(..., min_length=6, max_length=128)
+
+
 class SPAStaticFiles(StaticFiles):
     async def get_response(self, path, scope):
         try:
@@ -279,6 +284,27 @@ def login(payload: AuthPayload):
 @app.get("/api/auth/me")
 def me(current_user=Depends(get_current_user)):
     return current_user
+
+
+@app.post("/api/auth/reset-password")
+def reset_password(payload: PasswordChangeRequest, current_user=Depends(get_current_user)):
+    conn = get_db()
+    try:
+        row = conn.execute(
+            "SELECT password_hash FROM users WHERE id = ?",
+            (current_user["id"],),
+        ).fetchone()
+        if not row or not verify_password(payload.current_password, row["password_hash"]):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Current password is incorrect")
+        password_hash = hash_password(payload.new_password)
+        conn.execute(
+            "UPDATE users SET password_hash = ? WHERE id = ?",
+            (password_hash, current_user["id"]),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+    return {"status": "ok"}
 
 
 @app.get("/api/files", response_model=list[FileResponse])
