@@ -17,6 +17,7 @@ export default function useEventHandlers(mindMap, manualSave) {
   const appStore = useAppStore();
   const enableShowLoading = ref(true);
   let pendingFreeNode = null;
+  let expandAnchor = null;
   let svgNode = null;
   /** 执行命令，每执行一个命令就会在历史堆栈里添加一条记录用于回退或前进 */
   const execCommand = (...args) => {
@@ -58,13 +59,43 @@ export default function useEventHandlers(mindMap, manualSave) {
   };
 
   const onNodeTreeRenderEnd = () => {
-    if (!pendingFreeNode || !mindMap.value) {
+    if (!mindMap.value) {
       return;
     }
-    const { uid, position } = pendingFreeNode;
-    const node = mindMap.value.renderer.findNodeByUid(uid);
-    applyFreeNodeStyle(node, position);
-    pendingFreeNode = null;
+    if (pendingFreeNode) {
+      const { uid, position } = pendingFreeNode;
+      const node = mindMap.value.renderer.findNodeByUid(uid);
+      applyFreeNodeStyle(node, position);
+      pendingFreeNode = null;
+    }
+    if (expandAnchor) {
+      const node = mindMap.value.renderer.findNodeByUid(expandAnchor.uid);
+      if (node) {
+        const { scaleX, scaleY, translateX, translateY } =
+          mindMap.value.draw.transform();
+        const nextX = node.left * scaleX + translateX;
+        const nextY = node.top * scaleY + translateY;
+        const dx = expandAnchor.x - nextX;
+        const dy = expandAnchor.y - nextY;
+        if (dx || dy) {
+          mindMap.value.view.translateXY(dx, dy);
+        }
+      }
+      expandAnchor = null;
+    }
+  };
+
+  const onExpandBtnClick = (node) => {
+    if (!mindMap.value || !node || node.getData?.("isFreeNode")) {
+      return;
+    }
+    const { scaleX, scaleY, translateX, translateY } =
+      mindMap.value.draw.transform();
+    expandAnchor = {
+      uid: node.getData?.("uid") || node.uid,
+      x: node.left * scaleX + translateX,
+      y: node.top * scaleY + translateY,
+    };
   };
 
   const createFreeNode = (options = {}) => {
@@ -193,6 +224,7 @@ export default function useEventHandlers(mindMap, manualSave) {
     emitter.on("startPainter", handleStartPainter);
     emitter.on("node_tree_render_end", handleHideLoading);
     emitter.on("node_tree_render_end", onNodeTreeRenderEnd);
+    emitter.on("expand_btn_click", onExpandBtnClick);
     emitter.on("showLoading", handleShowLoading);
     emitter.on("localStorageExceeded", onLocalStorageExceeded);
     window.addEventListener("resize", handleResize);
@@ -215,6 +247,7 @@ export default function useEventHandlers(mindMap, manualSave) {
     emitter.off("startPainter", handleStartPainter);
     emitter.off("node_tree_render_end", handleHideLoading);
     emitter.off("node_tree_render_end", onNodeTreeRenderEnd);
+    emitter.off("expand_btn_click", onExpandBtnClick);
     emitter.off("showLoading", handleShowLoading);
     emitter.off("localStorageExceeded", onLocalStorageExceeded);
     window.removeEventListener("resize", handleResize);
